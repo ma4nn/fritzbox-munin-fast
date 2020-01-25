@@ -13,7 +13,7 @@
   env.fritzbox_ip [ip address of the fritzbox]
   env.fritzbox_password [fritzbox password]
   env.fritzbox_user [fritzbox user, set any value if not required]
-  env.dsl_modes []
+  env.dsl_modes [capacity] [snr] [damping] [errors] [crc]
 
   This plugin supports the following munin configuration parameters:
   #%# family=auto contrib
