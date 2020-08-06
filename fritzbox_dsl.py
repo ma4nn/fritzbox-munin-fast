@@ -79,26 +79,26 @@ def print_energy_stats():
       print_graph("dsl_capacity", capacity_recv, capacity_send)
 
     if 'snr' in modes:
-      snr_recv = root[1].xpath('tr[position() = 12]/td[position() = 3]')[0].text
-      snr_send = root[1].xpath('tr[position() = 12]/td[position() = 4]')[0].text
+      snr_recv = root[1].xpath('tr[position() = 13]/td[position() = 3]')[0].text
+      snr_send = root[1].xpath('tr[position() = 13]/td[position() = 4]')[0].text
       print_graph("dsl_snr", snr_recv, snr_send)
 
     if 'damping' in modes:    
-      damping_recv = root[1].xpath('tr[position() = 14]/td[position() = 3]')[0].text
-      damping_send = root[1].xpath('tr[position() = 14]/td[position() = 4]')[0].text
+      damping_recv = root[1].xpath('tr[position() = 15]/td[position() = 3]')[0].text
+      damping_send = root[1].xpath('tr[position() = 15]/td[position() = 4]')[0].text
       print_graph("dsl_damping", damping_recv, damping_send)
 
     if 'errors' in modes:    
       es_recv = root[4].xpath('tr[position() = 3]/td[position() = 2]')[0].text
-      es_send = root[4].xpath('tr[position() = 4]/td[position() = 2]')[0].text
-      ses_recv = root[4].xpath('tr[position() = 3]/td[position() = 3]')[0].text
+      es_send = root[4].xpath('tr[position() = 3]/td[position() = 3]')[0].text
+      ses_recv = root[4].xpath('tr[position() = 4]/td[position() = 2]')[0].text
       ses_send = root[4].xpath('tr[position() = 4]/td[position() = 3]')[0].text
       print_graph("dsl_errors", es_recv, es_send, prefix="es_")
       print_graph(None, ses_recv, ses_send, prefix="ses_")
 
     if 'crc' in modes:    
-      crc_recv = root[4].xpath('tr[position() = 3]/td[position() = 4]')[0].text
-      crc_send = root[4].xpath('tr[position() = 4]/td[position() = 4]')[0].text
+      crc_recv = root[4].xpath('tr[position() = 7]/td[position() = 2]')[0].text
+      crc_send = root[4].xpath('tr[position() = 7]/td[position() = 3]')[0].text
       print_graph("dsl_crc", crc_recv, crc_send)
 
 def print_config():
