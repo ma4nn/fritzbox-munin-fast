@@ -120,5 +120,5 @@ You can split the graphs of your FritzBox from the localhost graphs by following
 
 To test a plugin use
 ```
-munin-run fritzbox_connection_uptime.py
+munin-run --debug fritzbox_connection_uptime.py
 ```
