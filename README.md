@@ -20,7 +20,7 @@ Contrary to the original version this fork uses multigraphs. This removes the ne
 
 ### Connection Uptime
 Plugin: `fritzbox_connection_uptime.py`  
-Shows the WAN connection uptime.
+Shows the WAN connection uptime.  
 ![Connection Uptime](doc/connection_uptime.png)
 
 ### DSL Errors
@@ -33,7 +33,7 @@ Multigraph plugin, showing:
  - signal-to-noise ratio
 
 ### CPU & Memory
-Plugin: `fritzbox_ecostat.py`
+Plugin: `fritzbox_ecostat.py`  
 Multigraph plugin, showing:
  - memory usage
  - CPU load
