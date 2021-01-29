@@ -1,4 +1,4 @@
-# fritzbox-munin-fast
+# Munin Plugins for FritzBox
 
 A collection of munin plugins to monitor your AVM FRITZ!Box router. The scripts have been developed using a FRITZ!Box 7590 running FRITZ!OS 7.20.
 
@@ -12,49 +12,54 @@ These python scripts are [Munin](http://munin-monitoring.org) plugins for monito
 Contrary to the original version this fork uses multigraphs. This removes the need to query the same API endpoint multiple times. All multigraph plugins have configuration options to switch individual graphs on and off. 
 
 ## Requirements
+- FritzBox router
 - Munin 1.4.0 or later is required
 - Python 3.x
    
 ## Available Plugins
 
-### fritzbox_connection_uptime
-Shows the WAN connection uptime (requires fritzconnection)
+### Connection Uptime
+Plugin: `fritzbox_connection_uptime.py`  
+Shows the WAN connection uptime.
+![Connection Uptime](doc/connection_uptime.png)
 
-### fritzbox_dsl
+### DSL Errors
+Plugin: `fritzbox_dsl.py`  
 Multigraph plugin, showing:
  - DSL checksum errors
  - DSL transmission errors
  - line loss
  - link capacity
  - signal-to-noise ratio
- 
- (requires password)
 
-### fritzbox_ecostat
+### CPU & Memory
+Plugin: `fritzbox_ecostat.py`
 Multigraph plugin, showing:
  - memory usage
  - CPU load
  - CPU temperature
- 
-(requires password)
 
-### fritzbox_smart_home_temperature
+### Smart Home Temperature
+Plugin: `fritzbox_smart_home_temperature.py`  
+![Smart Home Temperature](doc/smart_home_temperature.png)
 
-### fritzbox_energy
+### Energy
+Plugin: `fritzbox_energy.py`  
 Multigraph plugin, showing:
  - power consumption for CPU, WiFi, WAN, Fon, USB and total
  - devices connected on WiFi and LAN
  - system uptime
- 
-(requires password)
 
-### fritzbox_link_saturation
-Multigraph plugin, showing saturation of WAN uplink and downlink by QoS priority (requries password)
+### Link Saturation
+Plugin: `fritzbox_link_saturation.py`  
+Multigraph plugin, showing saturation of WAN uplink and downlink by QoS priority
 
-### fritzbox_traffic
-Similar to fritzbox_link_saturation, but single-graph and without QoS monitoring (requires fritzconnection)
+### Traffic
+Plugin: `fritzbox_traffic.py`  
+Similar to fritzbox_link_saturation, but single-graph and without QoS monitoring.
 
-### fritzbox_wifi_load
+### WIFI
+Plugin: `fritzbox_wifi_load.py`  
 Multigraph plugin, showing for 2.4GHz and 5GHz
  - WiFi uplink and downlink bandwidth usage
  - neighbor APs on same and on different channels
@@ -120,5 +125,5 @@ You can split the graphs of your FritzBox from the localhost graphs by following
 
 To test a plugin use
 ```
-munin-run fritzbox_connection_uptime.py
+munin-run --debug fritzbox_connection_uptime.py
 ```
