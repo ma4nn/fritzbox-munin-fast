@@ -28,7 +28,7 @@ class FritzboxTraffic:
   def __init__(self):
     config = FritzboxConfig()
     try:
-      self.__connection = FritzStatus(address=config.server, password=config.password, use_tls=config.useTls)
+      self.__connection = FritzStatus(address=config.server, user=config.user, password=config.password, use_tls=config.useTls)
     except Exception as e:
       sys.exit("Couldn't get WAN traffic: " + str(e))
 
