@@ -26,19 +26,21 @@
 
 import hashlib
 import sys
-import os
 
 import requests
 from lxml import etree
 from FritzboxConfig import FritzboxConfig
+from FritzboxFileSession import FritzboxFileSession
 
 class FritzboxInterface:
   config = None
+  __session = None
   __baseUri = ""
 
   # default constructor
   def __init__(self):
     self.config = FritzboxConfig()
+    self.__session = FritzboxFileSession(self.config.server, self.config.user, self.config.port)
     self.__baseUri = self.__getBaseUri()
 
   def __getBaseUri(self):
@@ -54,30 +56,6 @@ class FritzboxInterface:
 
   def postPageWithLogin(self, page, data={}):
     return self.__callPageWithLogin(self.__post, page, data)
-
-  def __getSessionDir(self):
-    return os.getenv('MUNIN_PLUGSTATE') + '/fritzbox'
-
-  def __getSessionFilename(self):
-    return self.config.server + '__' + str(self.config.port) + '__' + self.config.user + '.sid'
-
-  def __saveSessionId(self, session_id):
-    if '__' in self.config.server or '__' in self.config.user:
-      raise Exception("Reserved string \"__\" in server or user name")
-    statedir = self.__getSessionDir()
-    if not os.path.exists(statedir):
-      os.makedirs(statedir)
-    statefilename = statedir + '/' + self.__getSessionFilename()
-    with open(statefilename, 'w') as statefile:
-      statefile.write(session_id)
-
-  def __loadSessionId(self):
-    statefilename = self.__getSessionDir() + '/' + self.__getSessionFilename()
-    if not os.path.exists(statefilename):
-      return None
-    with open(statefilename, 'r') as statefile:
-      session_id = statefile.readline()
-      return session_id
 
   def __getSessionId(self):
     """Obtains the session id after login into the Fritzbox.
@@ -128,12 +106,12 @@ class FritzboxInterface:
       print("ERROR - No SID received because of invalid password")
       sys.exit(0)
 
-    self.__saveSessionId(session_id)
+    self.__session.saveSessionId(session_id)
 
     return session_id
 
   def __callPageWithLogin(self, method, page, data={}):
-    session_id = self.__loadSessionId()
+    session_id = self.__session.loadSessionId()
 
     if session_id != None:
       try:
