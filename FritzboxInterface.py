@@ -55,19 +55,24 @@ class FritzboxInterface:
   def postPageWithLogin(self, page, data={}):
     return self.__callPageWithLogin(self.__post, page, data)
 
+  def __getSessionDir(self):
+    return os.getenv('MUNIN_PLUGSTATE') + '/fritzbox'
+
+  def __getSessionFilename(self):
+    return self.config.server + '__' + str(self.config.port) + '__' + self.config.user + '.sid'
+
   def __saveSessionId(self, session_id):
     if '__' in self.config.server or '__' in self.config.user:
       raise Exception("Reserved string \"__\" in server or user name")
-    statedir = os.getenv('MUNIN_PLUGSTATE') + '/fritzbox'
+    statedir = self.__getSessionDir()
     if not os.path.exists(statedir):
       os.makedirs(statedir)
-    statefilename = statedir + '/' + self.config.server + '__' + str(self.config.port) + '__' + self.config.user + '.sid'
+    statefilename = statedir + '/' + self.__getSessionFilename()
     with open(statefilename, 'w') as statefile:
       statefile.write(session_id)
 
   def __loadSessionId(self):
-    statedir = os.getenv('MUNIN_PLUGSTATE') + '/fritzbox'
-    statefilename = statedir + '/' + self.config.server + '__' + str(self.config.port) + '__' + self.config.user + '.sid'
+    statefilename = self.__getSessionDir() + '/' + self.__getSessionFilename()
     if not os.path.exists(statefilename):
       return None
     with open(statefilename, 'r') as statefile:

@@ -7,12 +7,12 @@ If you are using the scripts on a different Fritz!Box model please let me know b
 - opening an issue
 - submitting a pull request
 
-These python scripts are [Munin](http://munin-monitoring.org) plugins for monitoring the [Fritz!Box](http://avm.de/produkte/fritzbox/) router by AVM. They're build upon [fritzbox-munin](https://github.com/Tafkas/fritzbox-munin) with the goal to make use of the modern APIs that FritzOS 7 provides. No HTML Scraping is used. All data is fetched either through the TR-064 interface or the JSON API.
+These python scripts are [Munin](http://munin-monitoring.org) plugins for monitoring the [Fritz!Box](https://avm.de/produkte/fritzbox/) router by AVM. They're build upon [fritzbox-munin](https://github.com/Tafkas/fritzbox-munin) with the goal to make use of the modern APIs that FritzOS 7 provides. No HTML Scraping is used. All data is fetched either through the TR-064 interface or the JSON API.
 
 Contrary to the original version this fork uses multigraphs. This removes the need to query the same API endpoint multiple times. All multigraph plugins have configuration options to switch individual graphs on and off. 
 
 ## Requirements
-- FritzBox router
+- FritzBox router with Fritz!OS >= 07.20
 - Munin 1.4.0 or later is required
 - Python 3.x
    
