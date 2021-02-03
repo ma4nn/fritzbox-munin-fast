@@ -72,7 +72,7 @@ Multigraph plugin, showing for 2.4GHz and 5GHz
 
 1. Make sure the FritzBox has UPnP status information enabled. (web interface: _Home Network > Network > Network Settings > Universal Plug & Play (UPnP)_)
 
-1. Copy all the scripts to `/usr/share/munin/plugins`
+1. Copy all the scripts from `src/` folder to `/usr/share/munin/plugins`
 
 1. (optional) If you want to connect to FritzBox using SSL, download the Fritz certificate (web interface: _Internet > Freigaben > FritzBox Dienste > Zertifikat > Zertifikat herunterladen_) and save it to `/etc/munin/box.cer`.
 
