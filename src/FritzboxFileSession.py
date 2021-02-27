@@ -42,3 +42,6 @@ class FritzboxFileSession:
     with open(statefilename, 'r') as statefile:
       session_id = statefile.readline()
       return session_id
+
+  def clearSession(self):
+    os.remove(self.getSessionDir() + '/' + self.__getSessionFilename())

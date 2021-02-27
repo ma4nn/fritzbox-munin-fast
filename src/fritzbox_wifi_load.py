@@ -76,7 +76,11 @@ def print_wifi_load():
     if 'neighbors' in modes:
       chans = freqdata['usedChannels']
       chanData = freqdata['channels']
-      total = int(jsondata['cnt_' + freq].split(' ')[0])
+
+      total = jsondata['cnt_' + freq]
+      if (isinstance(total, str)):
+        total = int(total.split(' ')[0]) # for FritzOS 7.20|7.21
+
       sameChan = 0
       for chan in chanData:
         num = chan['value']

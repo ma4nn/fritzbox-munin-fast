@@ -63,7 +63,9 @@ class FritzboxInterface:
     try:
         jsonData = json.loads(data)
     except JSONDecodeError as e:
-      sys.exit('ERROR: Did not receive valid JSON data from FritzBox. Perhaps try to clear old session file in ' + self.__session.getSessionDir() + ': ' + str(e))
+      # Perhaps session expired, let's clear the session and try again
+      self.__session.clearSession()
+      sys.exit('ERROR: Did not receive valid JSON data from FritzBox, so automatically cleared the session, please try again.: ' + str(e))
 
     return jsonData
 
