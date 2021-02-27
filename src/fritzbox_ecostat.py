@@ -57,8 +57,7 @@ def print_system_stats():
   modes = get_modes()
 
   # download the graphs
-  data = FritzboxInterface().postPageWithLogin(PAGE, data=PARAMS)
-  jsondata = json.loads(data)['data']
+  jsondata = FritzboxInterface().postPageWithLogin(PAGE, data=PARAMS)['data']
 
   if 'cpu' in modes:
     cpuload_data = jsondata['cpuutil']

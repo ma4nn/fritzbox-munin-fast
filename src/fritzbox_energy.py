@@ -70,9 +70,7 @@ def print_energy_stats():
     type = get_type()
 
     # download the graphs
-    data = FritzboxInterface().postPageWithLogin(PAGE, data=PARAMS)
-    jsondata = json.loads(data)['data']['drain']
-
+    jsondata = FritzboxInterface().postPageWithLogin(PAGE, data=PARAMS)['data']['drain']
     devices = get_devices_for(type)
 
     if 'power' in modes:

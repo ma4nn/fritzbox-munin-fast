@@ -57,8 +57,7 @@ def print_wifi_load():
   fritzboxHelper = FritzboxInterface()
   fritzboxHelper.postPageWithLogin(PAGE, data=PARAMS_INIT)
   # download the graphs
-  data = fritzboxHelper.postPageWithLogin(PAGE, data=PARAMS)
-  jsondata = json.loads(data)['data']
+  jsondata = fritzboxHelper.postPageWithLogin(PAGE, data=PARAMS)['data']
 
   freqs = get_freqs()
   modes = get_modes()

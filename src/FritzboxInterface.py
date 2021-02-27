@@ -26,9 +26,12 @@
 
 import hashlib
 import sys
+import json
 
 import requests
 from lxml import etree
+from typing import Callable
+from json.decoder import JSONDecodeError
 from FritzboxConfig import FritzboxConfig
 from FritzboxFileSession import FritzboxFileSession
 
@@ -55,7 +58,14 @@ class FritzboxInterface:
     return self.__callPageWithLogin(self.__get, page, data)
 
   def postPageWithLogin(self, page: str, data={}) -> str:
-    return self.__callPageWithLogin(self.__post, page, data)
+    data = self.__callPageWithLogin(self.__post, page, data)
+
+    try:
+        jsonData = json.loads(data)
+    except JSONDecodeError as e:
+      sys.exit('ERROR: Did not receive valid JSON data from FritzBox. Perhaps try to clear old session file in ' + self.__session.getSessionDir() + ': ' + str(e))
+
+    return jsonData
 
   def __getSessionId(self) -> str:
     """Obtains the session id after login into the Fritzbox.
@@ -103,14 +113,14 @@ class FritzboxInterface:
     root = etree.fromstring(r.content)
     session_id = root.xpath('//SessionInfo/SID/text()')[0]
     if session_id == "0000000000000000":
-      print("ERROR - No SID received because of invalid password")
+      print("ERROR: No SID received because of invalid credentials")
       sys.exit(0)
 
     self.__session.saveSessionId(session_id)
 
     return session_id
 
-  def __callPageWithLogin(self, method, page, data={}) -> str:
+  def __callPageWithLogin(self, method: Callable[[], str], page, data={}) -> str:
     session_id = self.__session.loadSessionId()
 
     if session_id != None:
@@ -130,7 +140,7 @@ class FritzboxInterface:
     """Sends a POST request to the Fritzbox and returns the response
 
     :param session_id: a valid session id
-    :param page: the page you are regquesting
+    :param page: the page you are requesting
     :param data: POST data in a map
     :return: the content of the page
     """
@@ -150,7 +160,7 @@ class FritzboxInterface:
       """Fetches a page from the Fritzbox and returns its content
 
       :param session_id: a valid session id
-      :param page: the page you are regquesting
+      :param page: the page you are requesting
       :param params: GET parameters in a map
       :return: the content of the page
       """
