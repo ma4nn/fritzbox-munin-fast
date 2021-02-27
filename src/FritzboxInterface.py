@@ -43,7 +43,7 @@ class FritzboxInterface:
     self.__session = FritzboxFileSession(self.config.server, self.config.user, self.config.port)
     self.__baseUri = self.__getBaseUri()
 
-  def __getBaseUri(self):
+  def __getBaseUri(self) -> str:
     DEFAULT_PORTS = (80, 443)
     SCHEMES = ('http', 'https')
     if self.config.port and self.config.port != DEFAULT_PORTS[self.config.useTls]:
@@ -51,13 +51,13 @@ class FritzboxInterface:
     else:
         return '{}://{}'.format(SCHEMES[self.config.useTls], self.config.server)
 
-  def getPageWithLogin(self, page, data={}):
+  def getPageWithLogin(self, page: str, data={}) -> str:
     return self.__callPageWithLogin(self.__get, page, data)
 
-  def postPageWithLogin(self, page, data={}):
+  def postPageWithLogin(self, page: str, data={}) -> str:
     return self.__callPageWithLogin(self.__post, page, data)
 
-  def __getSessionId(self):
+  def __getSessionId(self) -> str:
     """Obtains the session id after login into the Fritzbox.
     See https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/AVM_Technical_Note_-_Session_ID.pdf
     for details (in German).
@@ -110,7 +110,7 @@ class FritzboxInterface:
 
     return session_id
 
-  def __callPageWithLogin(self, method, page, data={}):
+  def __callPageWithLogin(self, method, page, data={}) -> str:
     session_id = self.__session.loadSessionId()
 
     if session_id != None:
@@ -126,7 +126,7 @@ class FritzboxInterface:
     session_id = self.__getSessionId()
     return method(session_id, page, data)
 
-  def __post(self, session_id, page, data={}):
+  def __post(self, session_id, page, data={}) -> str:
     """Sends a POST request to the Fritzbox and returns the response
 
     :param session_id: a valid session id
@@ -146,7 +146,7 @@ class FritzboxInterface:
 
     return r.content
 
-  def __get(self, session_id, page, data={}):
+  def __get(self, session_id, page, data={}) -> str:
       """Fetches a page from the Fritzbox and returns its content
 
       :param session_id: a valid session id

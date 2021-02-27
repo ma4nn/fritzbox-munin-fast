@@ -17,10 +17,10 @@ class FritzboxFileSession:
     self.__user = user
     self.__port = port
 
-  def __getSessionDir(self):
+  def __getSessionDir(self) -> str:
     return os.getenv('MUNIN_PLUGSTATE') + '/fritzbox'
 
-  def __getSessionFilename(self):
+  def __getSessionFilename(self) -> str:
     return self.__server + self.__separator + str(self.__port) + self.__separator + self.__user + '.sid'
 
   def saveSessionId(self, session_id):
@@ -34,7 +34,7 @@ class FritzboxFileSession:
     with open(statefilename, 'w') as statefile:
       statefile.write(session_id)
 
-  def loadSessionId(self):
+  def loadSessionId(self) -> str:
     statefilename = self.__getSessionDir() + '/' + self.__getSessionFilename()
     if not os.path.exists(statefilename):
       return None
