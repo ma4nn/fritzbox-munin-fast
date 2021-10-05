@@ -2,7 +2,8 @@
 """
   FritzboxInterface - A munin plugin for Linux to monitor AVM Fritzbox
   Copyright (C) 2015 Christian Stade-Schuldt
-  Copyright (C) 2019 Rene Walendy
+  Copyright (C) 2021 Rene Walendy
+  Copyright (c) 2021 Oliver Edelmann
   Author: Christian Stade-Schuldt, Rene Walendy
   Like Munin, this plugin is licensed under the GNU GPL v2 license
   http://www.opensource.org/licenses/GPL-2.0
@@ -69,6 +70,32 @@ class FritzboxInterface:
 
     return jsonData
 
+  # Code from https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/AVM_Technical_Note_-_Session_ID_deutsch_2021-05-03.pdf
+  def __calculate_pbkdf2_response(self, challenge) -> str:
+    """ Calculate the response for a given challenge via PBKDF2 """
+    challenge_parts = challenge.split("$")
+    # Extract all necessary values encoded into the challenge
+    iter1 = int(challenge_parts[1])
+    salt1 = bytes.fromhex(challenge_parts[2])
+    iter2 = int(challenge_parts[3])
+    salt2 = bytes.fromhex(challenge_parts[4])
+    # Hash twice, once with static salt...
+    # Once with dynamic salt.
+    hash1 = hashlib.pbkdf2_hmac("sha256", self.config.password.encode(), salt1, iter1)
+    hash2 = hashlib.pbkdf2_hmac("sha256", hash1, salt2, iter2)
+    return f"{challenge_parts[4]}${hash2.hex()}"
+
+  # Code from https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/AVM_Technical_Note_-_Session_ID_deutsch_2021-05-03.pdf
+  def __calculate_md5_response(self, challenge) -> str:
+    """ Calculate the response for a challenge using legacy MD5 """
+    response = challenge + "-" + self.config.password
+    # the legacy response needs utf_16_le encoding
+    response = response.encode("utf_16_le")
+    md5_sum = hashlib.md5()
+    md5_sum.update(response)
+    response = challenge + "-" + md5_sum.hexdigest()
+    return response
+
   def __getSessionId(self) -> str:
     """Obtains the session id after login into the Fritzbox.
     See https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/AVM_Technical_Note_-_Session_ID.pdf
@@ -79,7 +106,7 @@ class FritzboxInterface:
 
     headers = {"Accept": "application/xml", "Content-Type": "text/plain"}
 
-    url = '{}/login_sid.lua'.format(self.__baseUri)
+    url = '{}/login_sid.lua?version=2'.format(self.__baseUri)
     try:
       r = requests.get(url, headers=headers, verify=self.config.certificateFile)
       r.raise_for_status()
@@ -92,10 +119,10 @@ class FritzboxInterface:
     session_id = root.xpath('//SessionInfo/SID/text()')[0]
     if session_id == "0000000000000000":
       challenge = root.xpath('//SessionInfo/Challenge/text()')[0]
-      challenge_bf = ('{}-{}'.format(challenge, self.config.password)).encode('utf-16le')
-      m = hashlib.md5()
-      m.update(challenge_bf)
-      response_bf = '{}-{}'.format(challenge, m.hexdigest().lower())
+      if challenge.startswith("2$"): # we received a PBKDF2 challenge
+          response_bf = self.__calculate_pbkdf2_response(challenge)
+      else: # or fall back to MD5
+          response_bf = self.__calculate_md5_response(challenge)
       params['response'] = response_bf
     else:
       return session_id
