@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
   fritzbox_energy - A munin plugin for Linux to monitor AVM Fritzbox energy
   stats
@@ -25,7 +25,7 @@ import os
 import re
 import sys
 import json
-import fritzbox_helper as fh
+from FritzboxInterface import FritzboxInterface
 
 PAGE = 'data.lua'
 PARAMS = {'xhr':1, 'lang':'de', 'page':'energy', 'xhrId':'all', 'useajax':1, 'no_sidrenew':None}
@@ -42,7 +42,7 @@ INFO = {
 }
 
 # date-from-text extractor foo
-locale = os.environ.get('locale', 'de')
+locale = os.getenv('locale', 'de')
 patternLoc = {"de": "(\d+)\s(Tag|Stunden|Minuten)",
               "en": "(\d+)\s(days|hours|minutes)"}
 dayLoc = {"de": "Tag", "en": "days"}
@@ -51,10 +51,10 @@ minutesLoc = {"de": "Minuten", "en": "minutes"}
 pattern = re.compile(patternLoc[locale])
 
 def get_modes():
-  return os.environ['energy_modes'].split(' ')
+  return os.getenv('energy_modes').split(' ')
 
 def get_type():
-  return os.environ['energy_product']
+  return os.getenv('energy_product')
 
 def get_devices_for(type):
   if type == "DSL":
@@ -69,14 +69,8 @@ def print_energy_stats():
     modes = get_modes()
     type = get_type()
 
-    server = os.environ['fritzbox_ip']
-    password = os.environ['fritzbox_password']
-    user = os.environ['fritzbox_user']
-
     # download the graphs
-    data = fh.post_page_with_login(server, user, password, PAGE, data=PARAMS)
-    jsondata = json.loads(data)['data']['drain']
-
+    jsondata = FritzboxInterface().postPageWithLogin(PAGE, data=PARAMS)['data']['drain']
     devices = get_devices_for(type)
 
     if 'power' in modes:
@@ -114,7 +108,7 @@ def print_energy_stats():
             if m.group(2) == minutesLoc[locale]:
                 hours += int(m.group(1)) / 60.0
         uptime = hours / 24
-        print "uptime.value %.2f" % uptime
+        print("uptime.value %.2f" % uptime)
 
 def print_config():
     modes = get_modes()
@@ -123,7 +117,7 @@ def print_config():
 
     if 'power' in modes:
       print("multigraph power")
-      print("graph_title AVM Fritz!Box Power Consumption")
+      print("graph_title Power Consumption")
       print("graph_vlabel %")
       print("graph_args --lower-limit 0 --upper-limit 100 --rigid")
       print("graph_category system")
@@ -144,7 +138,7 @@ def print_config():
 
     if 'devices' in modes:
       print("multigraph devices")
-      print("graph_title AVM Fritz!Box Connected Devices")
+      print("graph_title Connected Devices")
       print("graph_vlabel Number of devices")
       print("graph_args --base 1000")
       print("graph_category network")
@@ -159,17 +153,13 @@ def print_config():
 
     if 'uptime' in modes:
       print("multigraph uptime")
-      print("graph_title AVM Fritz!Box Uptime")
+      print("graph_title Uptime")
       print("graph_vlabel uptime in days")
       print("graph_args --base 1000 -l 0")
       print("graph_scale no")
       print("graph_category system")
       print("uptime.label uptime")
       print("uptime.draw AREA")
-
-    if os.environ.get('host_name'):
-        print("host_name " + os.environ['host_name'])
-
 
 if __name__ == "__main__":
   if len(sys.argv) == 2 and sys.argv[1] == 'config':
@@ -179,5 +169,5 @@ if __name__ == "__main__":
   elif len(sys.argv) == 1 or (len(sys.argv) == 2 and sys.argv[1] == 'fetch'):
     try:
       print_energy_stats()
-    except:
-      sys.exit("Couldn't retrieve fritzbox energy stats")
+    except Exception as e:
+      sys.exit("Couldn't retrieve fritzbox energy stats: " + str(e))

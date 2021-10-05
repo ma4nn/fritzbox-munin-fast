@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
   fritzbox_link_saturation - A munin plugin for Linux to monitor AVM Fritzbox
   WAN link saturation with QoS stats
@@ -23,7 +23,7 @@ import os
 import re
 import sys
 import json
-import fritzbox_helper as fh
+from FritzboxInterface import FritzboxInterface
 
 PAGE = 'internet/inetstat_monitor.lua'
 PARAMS = {'useajax':1, 'action':'get_graphic', 'xhr':1, 'myXhr':1}
@@ -42,11 +42,7 @@ def average_bps(datapoints):
 def print_link_saturation():
   """get the current DSL link saturation"""
 
-  server = os.environ['fritzbox_ip']
-  password = os.environ['fritzbox_password']
-  user = os.environ['fritzbox_user']
-
-  data = fh.get_page_with_login(server, user, password, PAGE, params=PARAMS)
+  data = FritzboxInterface().getPageWithLogin(PAGE, data=PARAMS)
   # all data is embedded in a one-element array, so strip that array away
   jsondata = json.loads(data)[0]
 
@@ -65,7 +61,7 @@ def print_link_saturation():
 
 def print_config():
   print("multigraph saturation_up")
-  print("graph_title AVM Fritz!Box uplink saturation")
+  print("graph_title Uplink saturation")
   print("graph_vlabel bits out per ${graph_period}")
   print("graph_category network")
   print("graph_args --base 1000 --lower-limit 0")
@@ -80,7 +76,7 @@ def print_config():
   print("maxup.graph LINE1")
 
   print("multigraph saturation_down")
-  print("graph_title AVM Fritz!Box downlink saturation")
+  print("graph_title Downlink saturation")
   print("graph_vlabel bits in per ${graph_period}")
   print("graph_category network")
   print("graph_args --base 1000 --lower-limit 0")
@@ -94,10 +90,6 @@ def print_config():
   print("maxdown.type GAUGE")
   print("maxdown.graph LINE1")
 
-  if os.environ.get('host_name'):
-      print("host_name " + os.environ['host_name'])
-
-
 if __name__ == "__main__":
   if len(sys.argv) == 2 and sys.argv[1] == 'config':
     print_config()
@@ -106,5 +98,5 @@ if __name__ == "__main__":
   elif len(sys.argv) == 1 or (len(sys.argv) == 2 and sys.argv[1] == 'fetch'):
     try:
       print_link_saturation()
-    except:
-      sys.exit("Couldn't retrieve fritzbox link saturation")
+    except Exception as e:
+      sys.exit("Couldn't retrieve fritzbox link saturation: " + str(e))

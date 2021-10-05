@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
   fritzbox_ecostat - A munin plugin for Linux to monitor AVM Fritzbox system
   stats
@@ -24,14 +24,14 @@ import os
 import re
 import sys
 import json
-import fritzbox_helper as fh
+from FritzboxInterface import FritzboxInterface
 
 PAGE = 'data.lua'
 PARAMS = {'xhr':1, 'lang':'de', 'page':'ecoStat', 'xhrId':'all', 'useajax':1, 'no_sidrenew':None}
 RAMLABELS = ['strict', 'cache', 'free']
 
 def get_modes():
-  return os.environ['ecostat_modes'].split(' ')
+  return os.getenv('ecostat_modes').split(' ')
 
 def print_simple_series(data, name, graph, low=None, high=None):
   """print last value of first json data series"""
@@ -56,13 +56,8 @@ def print_system_stats():
 
   modes = get_modes()
 
-  server = os.environ['fritzbox_ip']
-  password = os.environ['fritzbox_password']
-  user = os.environ['fritzbox_user']
-
   # download the graphs
-  data = fh.post_page_with_login(server, user, password, PAGE, data=PARAMS)
-  jsondata = json.loads(data)['data']
+  jsondata = FritzboxInterface().postPageWithLogin(PAGE, data=PARAMS)['data']
 
   if 'cpu' in modes:
     cpuload_data = jsondata['cpuutil']
@@ -81,7 +76,7 @@ def print_config():
 
   if 'cpu' in modes:
     print("multigraph cpuload")
-    print("graph_title AVM Fritz!Box CPU usage")
+    print("graph_title CPU usage")
     print("graph_vlabel %")
     print("graph_category system")
     print("graph_order cpu")
@@ -94,7 +89,7 @@ def print_config():
 
   if 'temp' in modes:
     print("multigraph cputemp")
-    print("graph_title AVM Fritz!Box CPU temperature")
+    print("graph_title CPU temperature")
     print("graph_vlabel degrees Celsius")
     print("graph_category sensors")
     print("graph_order tmp")
@@ -107,7 +102,7 @@ def print_config():
 
   if 'ram' in modes:
     print("multigraph ramusage")
-    print("graph_title AVM Fritz!Box Memory")
+    print("graph_title Memory")
     print("graph_vlabel %")
     print("graph_args --base 1000 -r --lower-limit 0 --upper-limit 100")
     print("graph_category system")
@@ -119,10 +114,6 @@ def print_config():
       print(l + ".type GAUGE")
       print(l + ".draw AREASTACK")
 
-  if os.environ.get('host_name'):
-    print("host_name " + os.environ['host_name'])
-
-
 if __name__ == "__main__":
   if len(sys.argv) == 2 and sys.argv[1] == 'config':
     print_config()
@@ -131,5 +122,5 @@ if __name__ == "__main__":
   elif len(sys.argv) == 1 or (len(sys.argv) == 2 and sys.argv[1] == 'fetch'):
     try:
       print_system_stats()
-    except:
-      sys.exit("Couldn't retrieve fritzbox system stats")
+    except Exception as e:
+      sys.exit("Couldn't retrieve fritzbox system stats: " + str(e))
