@@ -1,88 +1,100 @@
-# fritzbox-munin-fast
+# Munin Plugins for FritzBox
 
-A collection of munin plugins to monitor your AVM FRITZ!Box router. The scripts have been developed using a FRITZ!Box 7530 running FRITZ!OS 7.10.
+A collection of munin plugins to monitor your AVM FRITZ!Box router. The scripts have been developed using a FRITZ!Box 7590 running FRITZ!OS 7.25.
 
 If you are using the scripts on a different Fritz!Box model please let me know by
 
 - opening an issue
 - submitting a pull request
 
-## Introduction
+These python scripts are [Munin](http://munin-monitoring.org) plugins for monitoring the [Fritz!Box](https://avm.de/produkte/fritzbox/) router by AVM. They're build upon [fritzbox-munin](https://github.com/Tafkas/fritzbox-munin) with the goal to make use of the modern APIs that FritzOS 7 provides. No HTML Scraping is used. All data is fetched either through the TR-064 interface or the JSON API.
 
-   These python scripts are [Munin](http://munin-monitoring.org) plugins for monitoring the [Fritz!Box](http://avm.de/produkte/fritzbox/) router by AVM. They build upon [fritzbox-munin](https://github.com/Tafkas/fritzbox-munin) with the goal to make use of the modern APIs that FritzOS7 provides. No HTML Scraping is used. All data is fetched either through the TR-064 interface or the JSON API.
+Contrary to the original version this fork uses multigraphs. This removes the need to query the same API endpoint multiple times. All multigraph plugins have configuration options to switch individual graphs on and off. 
+
+## Requirements
+- FritzBox router with Fritz!OS >= 07.20
+- Munin 1.4.0 or later is required
+- Python 3.x
    
-   Contrary to the original version, this fork uses multigraphs. This removes the need to query the same API endpoint multiple times. All multigraph plugins have configuration options to switch individual graphs on and off. Munin 1.4.0 or later is required.
+## Available Plugins
 
-## fritzbox_connection_uptime
-Shows the WAN connection uptime (requires fritzconnection)
+### Connection Uptime
+Plugin: `fritzbox_connection_uptime.py`  
+Shows the WAN connection uptime.  
+![Connection Uptime](doc/connection_uptime.png)
 
-## fritzbox_dsl
+### DSL Errors
+Plugin: `fritzbox_dsl.py`  
 Multigraph plugin, showing:
  - DSL checksum errors
  - DSL transmission errors
  - line loss
  - link capacity
  - signal-to-noise ratio
- 
- (requires password)
 
-## fritzbox_ecostat
+### CPU & Memory
+Plugin: `fritzbox_ecostat.py`  
 Multigraph plugin, showing:
  - memory usage
  - CPU load
  - CPU temperature
- 
-(requires password)
 
-## fritzbox_energy
+### Smart Home Temperature
+Plugin: `fritzbox_smart_home_temperature.py`  
+![Smart Home Temperature](doc/smart_home_temperature.png)
+
+### Energy
+Plugin: `fritzbox_energy.py`  
 Multigraph plugin, showing:
  - power consumption for CPU, WiFi, WAN, Fon, USB and total
  - devices connected on WiFi and LAN
  - system uptime
- 
-(requires password)
 
-## fritzbox_link_saturation
-Multigraph plugin, showing saturation of WAN uplink and downlink by QoS priority (requries password)
+### Link Saturation
+Plugin: `fritzbox_link_saturation.py`  
+Multigraph plugin, showing saturation of WAN uplink and downlink by QoS priority
 
-## fritzbox_traffic
-Similar to fritzbox_link_saturation, but single-graph and without QoS monitoring (requires fritzconnection)
+### Traffic
+Plugin: `fritzbox_traffic.py`  
+Similar to fritzbox_link_saturation, but single-graph and without QoS monitoring.
 
-## fritzbox_wifi_load
+### WIFI
+Plugin: `fritzbox_wifi_load.py`  
 Multigraph plugin, showing for 2.4GHz and 5GHz
  - WiFi uplink and downlink bandwidth usage
  - neighbor APs on same and on different channels
 
 ## Installation & Configuration
 
-1. Pre-requesites for the fritzbox\_traffic and fritzbox\_connection\_uptime plugins are the [fritzconnection](https://pypi.python.org/pypi/fritzconnection) and [requests](https://pypi.python.org/pypi/requests) package. To install it
+1. Pre-requisites for the `fritzbox_traffic` and `fritzbox_connection_uptime` plugins are the [fritzconnection](https://pypi.python.org/pypi/fritzconnection) and [requests](https://pypi.python.org/pypi/requests) package. To install run
 
-        pip install fritzconnection
-        pip install requests
+        pip install -r requirements.txt
 
-2. Make sure the FritzBox has UPnP status information enabled. (German interface: Heimnetz > Heimnetzübersicht > Netzwerkeinstellungen > Statusinformationen über UPnP übertragen)
+1. Make sure the FritzBox has UPnP status information enabled. (web interface: _Home Network > Network > Network Settings > Universal Plug & Play (UPnP)_)
 
-3. Copy all the scripts to `/usr/share/munin/plugins`
+1. Copy all the scripts from `src/` folder to `/usr/share/munin/plugins`
 
-4. Create entry in `/etc/munin/plugin-conf.d/munin-node`:
+1. (optional) If you want to connect to FritzBox using SSL, download the Fritz certificate (web interface: _Internet > Freigaben > FritzBox Dienste > Zertifikat > Zertifikat herunterladen_) and save it to `/etc/munin/box.cer`.
+
+1. Create entry in `/etc/munin/plugin-conf.d/munin-node`:
 
         [fritzbox_*]
-        env.fritzbox_ip <ip_address_to_your_fritzbox>
         env.fritzbox_password <fritzbox_password>
         env.fritzbox_user <fritzbox_user>
+        env.fritzbox_use_tls true
         host_name fritzbox
    
    See the plugin files for plugin-specific configuration options.
 
-5. Create symbolic links to `/etc/munin/plugins`.
+1. For each plugin you want to activate, create a symbolic link to `/etc/munin/plugins`.
 
-6. Restart the munin-node daemon: `/etc/init.d/munin-node restart`.
+1. Restart the munin-node daemon: `service munin-node restart`.
 
-7. Done. You should now start to see the charts on the Munin pages.
+1. Done. You should now start to see the charts on the Munin pages!
 
 ## Localization
 
-The fritzbox_energy script depends on the language selected in your fritzbox. Currently, two locales are
+The `fritzbox_energy` script depends on the language selected in your fritzbox. Currently, two locales are
 supported:
 
 1. German: `de` (default)
@@ -92,9 +104,9 @@ You can change the used locale by setting an environment variable in your plugin
 
     env.locale en
 
-## Different hosts for the fritzbox and your system
+## Different hosts for the FritzBox and your system
 
-You can split the graphs of your fritzbox from the localhost graphs by following the next steps:
+You can split the graphs of your FritzBox from the localhost graphs by following the next steps:
 
 1. Use the following as your host configuration in `/etc/munin/munin.conf`
 
@@ -107,12 +119,11 @@ You can split the graphs of your fritzbox from the localhost graphs by following
             address 127.0.0.1
             use_node_name no
 
-2. Add the following to your munin-node configuration
+1. Restart your munin-node: `service restart munin-node`
 
-    env.host_name fritzbox
+## Testing
 
-3. Restart your munin-node: `systemctl restart munin-node`
-
-## Environment Settings
-
-  Do not forget to restart the munin-node daemon as described in step 3 of the installation instructions above.
+To test a plugin use
+```
+munin-run --debug fritzbox_connection_uptime.py
+```
