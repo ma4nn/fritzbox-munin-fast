@@ -24,7 +24,6 @@
 import os
 import re
 import sys
-import json
 from FritzboxInterface import FritzboxInterface
 
 PAGE = 'data.lua'
@@ -64,102 +63,102 @@ def get_devices_for(type):
   raise Exception("No such type")
 
 def print_energy_stats():
-    """print the current energy statistics"""
+  """print the current energy statistics"""
 
-    modes = get_modes()
-    type = get_type()
+  modes = get_modes()
+  type = get_type()
 
-    # download the graphs
-    jsondata = FritzboxInterface().postPageWithLogin(PAGE, data=PARAMS)['data']['drain']
-    devices = get_devices_for(type)
+  # download the graphs
+  jsondata = FritzboxInterface().postPageWithLogin(PAGE, data=PARAMS)['data']['drain']
+  devices = get_devices_for(type)
 
-    if 'power' in modes:
-      print("multigraph power")
-      for i in range(len(devices)):
-        if not HASPOWERSTATS[devices[i]]:
-          continue
-        val = jsondata[i]['actPerc']
-        print(devices[i] + ".value " + str(val))
-    
-    if 'devices' in modes:
-      print("multigraph devices")
-      # this is an array
-      statuses_wifi = jsondata[devices.index('wifi')]['statuses']
-      if len(statuses_wifi) == 2:
-        line = statuses_wifi[1]
-        num = line.split()[0]
-        print('wifi.value ' + num)
-      # this is a string (AVM, whyyy?)
-      status_lan = jsondata[devices.index('lan')]['statuses']
-      num = status_lan.split()[0]
-      print('lan.value ' + num)
-      
-    if 'uptime' in modes:
-      print("multigraph uptime")
-      status_uptime = jsondata[devices.index('system')]['statuses']
-      matches = re.finditer(pattern, status_uptime)
-      if matches:
-        hours = 0.0
-        for m in matches:
-            if m.group(2) == dayLoc[locale]:
-                hours += 24 * int(m.group(1))
-            if m.group(2) == hourLoc[locale]:
-                hours += int(m.group(1))
-            if m.group(2) == minutesLoc[locale]:
-                hours += int(m.group(1)) / 60.0
-        uptime = hours / 24
-        print("uptime.value %.2f" % uptime)
+  if 'power' in modes:
+    print("multigraph power")
+    for i in range(len(devices)):
+      if not HASPOWERSTATS[devices[i]]:
+        continue
+      val = jsondata[i]['actPerc']
+      print(devices[i] + ".value " + str(val))
+
+  if 'devices' in modes:
+    print("multigraph devices")
+    # this is an array
+    statuses_wifi = jsondata[devices.index('wifi')]['statuses']
+    if len(statuses_wifi) == 2:
+      line = statuses_wifi[1]
+      num = line.split()[0]
+      print('wifi.value ' + num)
+    # this is a string (AVM, whyyy?)
+    status_lan = jsondata[devices.index('lan')]['statuses']
+    num = status_lan.split()[0]
+    print('lan.value ' + num)
+
+  if 'uptime' in modes:
+    print("multigraph uptime")
+    status_uptime = jsondata[devices.index('system')]['statuses']
+    matches = re.finditer(pattern, status_uptime)
+    if matches:
+      hours = 0.0
+      for m in matches:
+        if m.group(2) == dayLoc[locale]:
+          hours += 24 * int(m.group(1))
+        if m.group(2) == hourLoc[locale]:
+          hours += int(m.group(1))
+        if m.group(2) == minutesLoc[locale]:
+          hours += int(m.group(1)) / 60.0
+      uptime = hours / 24
+      print("uptime.value %.2f" % uptime)
 
 def print_config():
-    modes = get_modes()
-    type = get_type()
-    devices = get_devices_for(type)
+  modes = get_modes()
+  type = get_type()
+  devices = get_devices_for(type)
 
-    if 'power' in modes:
-      print("multigraph power")
-      print("graph_title Power Consumption")
-      print("graph_vlabel %")
-      print("graph_args --lower-limit 0 --upper-limit 100 --rigid")
-      print("graph_category system")
-      order = ""
-      for d in devices:
-        if HASPOWERSTATS[d]:
-          order += " " + d
-      print("graph_order" + order)
-      for d in devices:
-        if not HASPOWERSTATS[d]:
-          continue
-        print(d + ".label " + d)
-        print(d + ".type GAUGE")
-        print(d + ".graph LINE1")
-        print(d + ".min 0")
-        print(d + ".max 100")
-        print(d + ".info " + INFO[d])
+  if 'power' in modes:
+    print("multigraph power")
+    print("graph_title Power Consumption")
+    print("graph_vlabel %")
+    print("graph_args --lower-limit 0 --upper-limit 100 --rigid")
+    print("graph_category system")
+    order = ""
+    for d in devices:
+      if HASPOWERSTATS[d]:
+        order += " " + d
+    print("graph_order" + order)
+    for d in devices:
+      if not HASPOWERSTATS[d]:
+        continue
+      print(d + ".label " + d)
+      print(d + ".type GAUGE")
+      print(d + ".graph LINE1")
+      print(d + ".min 0")
+      print(d + ".max 100")
+      print(d + ".info " + INFO[d])
 
-    if 'devices' in modes:
-      print("multigraph devices")
-      print("graph_title Connected Devices")
-      print("graph_vlabel Number of devices")
-      print("graph_args --base 1000")
-      print("graph_category network")
-      print("wifi.type GAUGE")
-      print("wifi.graph LINE1")
-      print("wifi.label wifi")
-      print("wifi.info Wifi Connections on 2.4 & 5 Ghz")
-      print("lan.type GAUGE")
-      print("lan.graph LINE1")
-      print("lan.label lan")
-      print("lan.info LAN Connections")
+  if 'devices' in modes:
+    print("multigraph devices")
+    print("graph_title Connected Devices")
+    print("graph_vlabel Number of devices")
+    print("graph_args --base 1000")
+    print("graph_category network")
+    print("wifi.type GAUGE")
+    print("wifi.graph LINE1")
+    print("wifi.label wifi")
+    print("wifi.info Wifi Connections on 2.4 & 5 Ghz")
+    print("lan.type GAUGE")
+    print("lan.graph LINE1")
+    print("lan.label lan")
+    print("lan.info LAN Connections")
 
-    if 'uptime' in modes:
-      print("multigraph uptime")
-      print("graph_title Uptime")
-      print("graph_vlabel uptime in days")
-      print("graph_args --base 1000 -l 0")
-      print("graph_scale no")
-      print("graph_category system")
-      print("uptime.label uptime")
-      print("uptime.draw AREA")
+  if 'uptime' in modes:
+    print("multigraph uptime")
+    print("graph_title Uptime")
+    print("graph_vlabel uptime in days")
+    print("graph_args --base 1000 -l 0")
+    print("graph_scale no")
+    print("graph_category system")
+    print("uptime.label uptime")
+    print("uptime.draw AREA")
 
 if __name__ == "__main__":
   if len(sys.argv) == 2 and sys.argv[1] == 'config':

@@ -22,9 +22,7 @@
 """
 
 import os
-import re
 import sys
-import json
 from FritzboxInterface import FritzboxInterface
 
 PAGE = 'data.lua'
