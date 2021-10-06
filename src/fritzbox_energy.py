@@ -84,10 +84,9 @@ def print_energy_stats():
     print("multigraph devices")
     # this is an array
     statuses_wifi = jsondata[devices.index('wifi')]['statuses']
-    if len(statuses_wifi) == 2:
-      line = statuses_wifi[1]
-      num = line.split()[0]
-      print('wifi.value ' + num)
+    line = statuses_wifi[-1] # take last entry
+    num = line.split()[0]
+    print('wifi.value ' + num)
     # this is a string (AVM, whyyy?)
     status_lan = jsondata[devices.index('lan')]['statuses']
     num = status_lan.split()[0]
