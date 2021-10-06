@@ -1,4 +1,4 @@
-# Munin Plugins for FritzBox
+# Munin Plugins for FRITZ!Box
 
 A collection of munin plugins to monitor your AVM FRITZ!Box router. The scripts have been developed using a FRITZ!Box 7590 running FRITZ!OS 7.25 and a FRITZ!WLAN Repeater 1750E running FRITZ!OS 7.27.
 

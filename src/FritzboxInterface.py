@@ -65,7 +65,7 @@ class FritzboxInterface:
       jsonData = json.loads(data)
     except JSONDecodeError as e:
       # Perhaps session expired, let's clear the session and try again
-      self.__session.clearSession()
+      self.__session.clear_session()
       sys.exit('ERROR: Did not receive valid JSON data from FritzBox, so automatically cleared the session, please try again.: ' + str(e))
 
     return jsonData
@@ -145,12 +145,12 @@ class FritzboxInterface:
       print("ERROR: No SID received because of invalid credentials")
       sys.exit(0)
 
-    self.__session.saveSessionId(session_id)
+    self.__session.save_session_id(session_id)
 
     return session_id
 
   def __callPageWithLogin(self, method: Callable[[], str], page, data={}) -> str:
-    session_id = self.__session.loadSessionId()
+    session_id = self.__session.load_session_id()
 
     if session_id != None:
       try:

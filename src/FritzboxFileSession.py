@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
+"""
+  Handling FRITZ!Box file sessions
+"""
 
 import os
+
+def get_session_dir() -> str:
+  return os.getenv('MUNIN_PLUGSTATE') + '/fritzbox'
 
 class FritzboxFileSession:
   __separator = "__"
@@ -17,31 +23,28 @@ class FritzboxFileSession:
     self.__user = user
     self.__port = port
 
-  def getSessionDir(self) -> str:
-    return os.getenv('MUNIN_PLUGSTATE') + '/fritzbox'
-
-  def __getSessionFilename(self) -> str:
+  def __get_session_filename(self) -> str:
     return self.__server + self.__separator + str(self.__port) + self.__separator + self.__user + '.sid'
 
-  def saveSessionId(self, session_id):
-    statedir = self.getSessionDir()
+  def save_session_id(self, session_id):
+    statedir = get_session_dir()
 
     if not os.path.exists(statedir):
       os.makedirs(statedir)
 
-    statefilename = statedir + '/' + self.__getSessionFilename()
+    statefilename = statedir + '/' + self.__get_session_filename()
 
-    with open(statefilename, 'w') as statefile:
+    with open(statefilename, 'w', encoding='utf8') as statefile:
       statefile.write(session_id)
 
-  def loadSessionId(self) -> str:
-    statefilename = self.getSessionDir() + '/' + self.__getSessionFilename()
+  def load_session_id(self) -> str:
+    statefilename = get_session_dir() + '/' + self.__get_session_filename()
     if not os.path.exists(statefilename):
       return None
 
-    with open(statefilename, 'r') as statefile:
+    with open(statefilename, 'r', encoding='utf8') as statefile:
       session_id = statefile.readline()
       return session_id
 
-  def clearSession(self):
-    os.remove(self.getSessionDir() + '/' + self.__getSessionFilename())
+  def clear_session(self):
+    os.remove(get_session_dir() + '/' + self.__get_session_filename())

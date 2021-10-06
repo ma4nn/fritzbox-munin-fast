@@ -33,17 +33,17 @@ class FritzboxTraffic:
     except FritzConnectionException as connection_exception:
       sys.exit("Couldn't get WAN traffic: " + str(connection_exception))
 
-  def printTraffic(self):
+  def print_traffic(self):
     transmission_rate = self.__connection.transmission_rate
-    print('down.value %d' % transmission_rate[1])
-    print('up.value %d' % transmission_rate[0])
+    print(f"down.value {transmission_rate[1]}")
+    print(f"up.value {transmission_rate[0]}")
 
     if not os.environ.get('traffic_remove_max') or "false" in os.environ.get('traffic_remove_max'):
       max_traffic = self.__connection.max_bit_rate
-      print('maxdown.value %d' % max_traffic[1])
-      print('maxup.value %d' % max_traffic[0])
+      print(f"maxdown.value {max_traffic[1]}")
+      print(f"maxup.value {max_traffic[0]}")
 
-  def printConfig(self):
+  def print_config(self):
     max_traffic = self.__connection.max_bit_rate
 
     print("graph_title WAN traffic")
@@ -56,13 +56,13 @@ class FritzboxTraffic:
     print("down.graph no")
     print("down.cdef down,8,*")
     print("down.min 0")
-    print(f"down.max %d{max_traffic[1]}")
+    print(f"down.max {max_traffic[1]}")
     print("up.label bps")
     print("up.type DERIVE")
     print("up.draw LINE")
     print("up.cdef up,8,*")
     print("up.min 0")
-    print(f"up.max %d{max_traffic[0]}")
+    print(f"up.max {max_traffic[0]}")
     print("up.negative down")
     print("up.info Traffic of the WAN interface.")
     if not os.environ.get('traffic_remove_max') or "false" in os.environ.get('traffic_remove_max'):
@@ -78,11 +78,11 @@ class FritzboxTraffic:
 if __name__ == "__main__":
   traffic = FritzboxTraffic()
   if len(sys.argv) == 2 and sys.argv[1] == 'config':
-    traffic.printConfig()
+    traffic.print_config()
   elif len(sys.argv) == 2 and sys.argv[1] == 'autoconf':
     print("yes")  # Some docs say it'll be called with fetch, some say no arg at all
   elif len(sys.argv) == 1 or (len(sys.argv) == 2 and sys.argv[1] == 'fetch'):
     try:
-      traffic.printTraffic()
+      traffic.print_traffic()
     except Exception as e:
       sys.exit("Couldn't retrieve fritzbox traffic: " + str(e))
