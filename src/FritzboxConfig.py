@@ -14,13 +14,13 @@ class FritzboxConfig:
 
   # default constructor
   def __init__(self):
-      if os.getenv('fritzbox_ip'):
-        self.server = str(os.getenv('fritzbox_ip'))
-      if os.getenv('fritzbox_port'):
-        self.port = int(os.getenv('fritzbox_port'))
-      self.user = str(os.getenv('fritzbox_user'))
-      self.password = str(os.getenv('fritzbox_password'))
-      if os.getenv('fritzbox_certificate'):
-        self.certificateFile = str(os.getenv('fritzbox_certificate'))
-      if os.getenv('fritzbox_use_tls'):
-        self.useTls = str(os.getenv('fritzbox_use_tls')) == 'true'
+    if os.getenv('fritzbox_ip'):
+      self.server = str(os.getenv('fritzbox_ip'))
+    if os.getenv('fritzbox_port'):
+      self.port = int(os.getenv('fritzbox_port'))
+    self.user = str(os.getenv('fritzbox_user'))
+    self.password = str(os.getenv('fritzbox_password'))
+    if os.getenv('fritzbox_certificate'):
+      self.certificateFile = str(os.getenv('fritzbox_certificate'))
+    if os.getenv('fritzbox_use_tls'):
+      self.useTls = str(os.getenv('fritzbox_use_tls')) == 'true'

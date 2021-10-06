@@ -51,9 +51,9 @@ class FritzboxInterface:
     DEFAULT_PORTS = (80, 443)
     SCHEMES = ('http', 'https')
     if self.config.port and self.config.port != DEFAULT_PORTS[self.config.useTls]:
-        return '{}://{}:{}'.format(SCHEMES[self.config.useTls], self.config.server, self.config.port)
+      return '{}://{}:{}'.format(SCHEMES[self.config.useTls], self.config.server, self.config.port)
     else:
-        return '{}://{}'.format(SCHEMES[self.config.useTls], self.config.server)
+      return '{}://{}'.format(SCHEMES[self.config.useTls], self.config.server)
 
   def getPageWithLogin(self, page: str, data={}) -> str:
     return self.__callPageWithLogin(self.__get, page, data)
@@ -62,7 +62,7 @@ class FritzboxInterface:
     data = self.__callPageWithLogin(self.__post, page, data)
 
     try:
-        jsonData = json.loads(data)
+      jsonData = json.loads(data)
     except JSONDecodeError as e:
       # Perhaps session expired, let's clear the session and try again
       self.__session.clearSession()
@@ -120,9 +120,9 @@ class FritzboxInterface:
     if session_id == "0000000000000000":
       challenge = root.xpath('//SessionInfo/Challenge/text()')[0]
       if challenge.startswith("2$"): # we received a PBKDF2 challenge
-          response_bf = self.__calculate_pbkdf2_response(challenge)
+        response_bf = self.__calculate_pbkdf2_response(challenge)
       else: # or fall back to MD5
-          response_bf = self.__calculate_md5_response(challenge)
+        response_bf = self.__calculate_md5_response(challenge)
       params['response'] = response_bf
     else:
       return session_id
@@ -186,21 +186,21 @@ class FritzboxInterface:
     return r.content
 
   def __get(self, session_id, page, data={}) -> str:
-      """Fetches a page from the Fritzbox and returns its content
+    """Fetches a page from the Fritzbox and returns its content
 
-      :param session_id: a valid session id
-      :param page: the page you are requesting
-      :param params: GET parameters in a map
-      :return: the content of the page
-      """
+    :param session_id: a valid session id
+    :param page: the page you are requesting
+    :param params: GET parameters in a map
+    :return: the content of the page
+    """
 
-      headers = {"Accept": "application/xml", "Content-Type": "text/plain"}
+    headers = {"Accept": "application/xml", "Content-Type": "text/plain"}
 
-      params = data
-      params["sid"] = session_id
-      url = '{}/{}'.format(self.__baseUri, page)
+    params = data
+    params["sid"] = session_id
+    url = '{}/{}'.format(self.__baseUri, page)
 
-      r = requests.get(url, headers=headers, params=params, verify=self.config.certificateFile)
-      r.raise_for_status()
+    r = requests.get(url, headers=headers, params=params, verify=self.config.certificateFile)
+    r.raise_for_status()
 
-      return r.content
+    return r.content
