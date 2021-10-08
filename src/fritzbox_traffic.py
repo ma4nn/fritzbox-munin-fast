@@ -26,12 +26,10 @@ from fritzconnection.core.exceptions import FritzConnectionException
 from FritzboxConfig import FritzboxConfig
 
 class FritzboxTraffic:
-  def __init__(self):
-    config = FritzboxConfig()
-    try:
-      self.__connection = FritzStatus(address=config.server, user=config.user, password=config.password, use_tls=config.useTls)
-    except FritzConnectionException as connection_exception:
-      sys.exit("Couldn't get WAN traffic: " + str(connection_exception))
+  __connection = None
+
+  def __init__(self, fritzStatusConnection: FritzStatus):
+    self.__connection = fritzStatusConnection
 
   def print_traffic(self):
     transmission_rate = self.__connection.transmission_rate
@@ -76,13 +74,15 @@ class FritzboxTraffic:
       print("maxup.info Maximum speed of the WAN interface.")
 
 if __name__ == "__main__":
-  traffic = FritzboxTraffic()
+  config = FritzboxConfig()
+  try:
+    traffic = FritzboxTraffic(FritzStatus(address=config.server, user=config.user, password=config.password, use_tls=config.useTls))
+  except FritzConnectionException as connection_exception:
+    sys.exit("Couldn't get traffic: " + str(connection_exception))
+
   if len(sys.argv) == 2 and sys.argv[1] == 'config':
     traffic.print_config()
   elif len(sys.argv) == 2 and sys.argv[1] == 'autoconf':
     print("yes")  # Some docs say it'll be called with fetch, some say no arg at all
   elif len(sys.argv) == 1 or (len(sys.argv) == 2 and sys.argv[1] == 'fetch'):
-    try:
-      traffic.print_traffic()
-    except Exception as e:
-      sys.exit("Couldn't retrieve fritzbox traffic: " + str(e))
+    traffic.print_traffic()
