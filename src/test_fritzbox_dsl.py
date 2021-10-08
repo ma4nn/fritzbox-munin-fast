@@ -9,30 +9,14 @@ import unittest
 import sys
 from fritzbox_dsl import FritzboxDsl
 from FritzboxInterface import FritzboxInterface
-from parameterized_test_case import ParametrizedTestCase
+from base_test_case import BaseTestCase
 
-class TestFritzboxDsl(ParametrizedTestCase):
-  def side_effect_func_get_page_with_login(self, page: str, data):
-    if (page == 'internet/inetstat_monitor.lua'):
-      file = open(f"tests/fritzbox{self.param}/inetstat_monitor_lua.txt", "r")
-      return file.read()
-    elif (page == 'internet/dsl_stats_tab.lua'):
-      file = open(f"tests/fritzbox{self.param}/dsl_stats_tab_lua.txt", "r")
-      return file.read()
-
-    return ''
-
-  def __get_interface_mock(self) -> Mock:
-    mock_interface = Mock()
-    mock_interface.get_page_with_login = Mock(side_effect=self.side_effect_func_get_page_with_login)
-
-    return mock_interface
-
+class TestFritzboxDsl(BaseTestCase):
   @unittest.mock.patch.dict(os.environ, {
     "dsl_modes": "INVALID"
   })
   def test_config_with_invalid_modes_only(self):
-    dsl = FritzboxDsl(self.__get_interface_mock())
+    dsl = FritzboxDsl(self._get_interface_mock())
     dsl.print_config()
 
     # pylint: disable=no-member
@@ -43,7 +27,7 @@ class TestFritzboxDsl(ParametrizedTestCase):
     "dsl_modes": "capacity snr damping errors crc INVALID"
   })
   def test_config(self):
-    dsl = FritzboxDsl(self.__get_interface_mock())
+    dsl = FritzboxDsl(self._get_interface_mock())
     dsl.print_config()
 
     # pylint: disable=no-member
@@ -132,7 +116,7 @@ ses_send.min 0
 ses_send.warning 1""")
 
   def test_print_dsl_stats(self):
-    dsl = FritzboxDsl(self.__get_interface_mock())
+    dsl = FritzboxDsl(self._get_interface_mock())
     dsl.print_dsl_stats()
 
     # pylint: disable=no-member
@@ -158,6 +142,6 @@ send.value 0""")
 if __name__ == '__main__':
   suite = unittest.TestSuite()
   for fritzbox_model in ['7590-7.28']:
-    suite.addTest(ParametrizedTestCase.parametrize(TestFritzboxDsl, param=fritzbox_model))
+    suite.addTest(BaseTestCase.parametrize(TestFritzboxDsl, param=fritzbox_model))
 
   unittest.TextTestRunner(verbosity=2, buffer=True).run(suite)
