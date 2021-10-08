@@ -140,3 +140,14 @@ To test a plugin use
 ```
 munin-run --debug fritzbox_connection_uptime.py
 ```
+
+## Unit Tests
+
+Run all unit tests with
+```
+python3 -m unittest -b
+```
+or a single unit test with
+```
+python3 -m unittest -b test/test_fritzbox_dsl.py
+```

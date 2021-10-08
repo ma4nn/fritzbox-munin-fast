@@ -10,7 +10,7 @@ class BaseTestCase(unittest.TestCase):
   """ TestCase classes that want to be parametrized should
       inherit from this class.
   """
-  def __init__(self, methodName='runTest', param=None):
+  def __init__(self, methodName='runTest', param="7590-7.28"):# default fritzbox model
     super(BaseTestCase, self).__init__(methodName)
     self.param = param
 
@@ -28,16 +28,16 @@ class BaseTestCase(unittest.TestCase):
 
   def __side_effect_func_page_with_login(self, page: str, data):
     if (page == 'internet/inetstat_monitor.lua'):
-      file = open(f"tests/fritzbox{self.param}/inetstat_monitor_lua.txt", "r")
+      file = open(f"test/fixtures/fritzbox{self.param}/inetstat_monitor_lua.txt", "r")
       return file.read()
     elif (page == 'internet/dsl_stats_tab.lua'):
-      file = open(f"tests/fritzbox{self.param}/dsl_stats_tab_lua.txt", "r")
+      file = open(f"test/fixtures/fritzbox{self.param}/dsl_stats_tab_lua.txt", "r")
       return file.read()
     elif (page == 'data.lua' and data['page'] == 'ecoStat'):
-      file = open(f"tests/fritzbox{self.param}/ecostat_data_lua.txt", "r")
+      file = open(f"test/fixtures/fritzbox{self.param}/ecostat_data_lua.txt", "r")
       return json.loads(file.read())
     elif (page == 'data.lua' and data['page'] == 'energy'):
-      file = open(f"tests/fritzbox{self.param}/energy_data_lua.txt", "r")
+      file = open(f"test/fixtures/fritzbox{self.param}/energy_data_lua.txt", "r")
       return json.loads(file.read())
 
     return ''
