@@ -33,8 +33,11 @@ class BaseTestCase(unittest.TestCase):
     elif (page == 'internet/dsl_stats_tab.lua'):
       file = open(f"tests/fritzbox{self.param}/dsl_stats_tab_lua.txt", "r")
       return file.read()
-    elif (page == 'data.lua'):
-      file = open(f"tests/fritzbox{self.param}/data_lua.txt", "r")
+    elif (page == 'data.lua' and data['page'] == 'ecoStat'):
+      file = open(f"tests/fritzbox{self.param}/ecostat_data_lua.txt", "r")
+      return json.loads(file.read())
+    elif (page == 'data.lua' and data['page'] == 'energy'):
+      file = open(f"tests/fritzbox{self.param}/energy_data_lua.txt", "r")
       return json.loads(file.read())
 
     return ''

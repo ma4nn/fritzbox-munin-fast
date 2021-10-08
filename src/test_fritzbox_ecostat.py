@@ -24,7 +24,7 @@ class TestFritzboxEcostat(BaseTestCase):
     self.assertEqual(output, "")
 
   @unittest.mock.patch.dict(os.environ, {
-    "dsl_modes": "cpu temp ram INVALID"
+    "ecostat_modes": "cpu temp ram INVALID"
   })
   def test_config(self):
     dsl = FritzboxEcostat(self._get_interface_mock())
