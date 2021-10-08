@@ -26,7 +26,7 @@ from FritzboxConfig import FritzboxConfig
 class FritzboxConnectionUptime:
   __connection = None
 
-  def __init__(self, fritzStatusConnection):
+  def __init__(self, fritzStatusConnection: FritzStatus):
     self.__connection = fritzStatusConnection
 
   def print_uptime(self):

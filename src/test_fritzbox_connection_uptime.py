@@ -8,7 +8,7 @@ import unittest
 import sys
 from fritzbox_connection_uptime import FritzboxConnectionUptime
 
-def get_fritzstatus_mock():
+def get_fritzstatus_mock() -> Mock:
   mock_fritzstatus = Mock()
   mock_fritzstatus.external_ip = '127.0.0.1'
   mock_fritzstatus.external_ipv6 = '0000::0000::0000::0000'
