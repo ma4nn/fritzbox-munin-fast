@@ -86,10 +86,14 @@ def print_energy_stats():
     statuses_wifi = jsondata[devices.index('wifi')]['statuses']
     line = statuses_wifi[-1] # take last entry
     num = line.split()[0]
+    if not num.isnumeric(): # 0 becomes "keine" in the German interface
+      num = "0"
     print('wifi.value ' + num)
     # this is a string (AVM, whyyy?)
     status_lan = jsondata[devices.index('lan')]['statuses']
     num = status_lan.split()[0]
+    if not num.isnumeric():
+      num = "0"
     print('lan.value ' + num)
 
   if 'uptime' in modes:
