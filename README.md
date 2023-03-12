@@ -1,6 +1,6 @@
 # Munin Plugins for FritzBox
 
-A collection of munin plugins to monitor your AVM FRITZ!Box router. The scripts have been developed using a FRITZ!Box 7590 running FRITZ!OS 7.25 and a FRITZ!WLAN Repeater 1750E running FRITZ!OS 7.27.
+A collection of munin plugins to monitor your AVM FRITZ!Box router. The scripts have been developed using a FRITZ!Box 7590 running FRITZ!OS 7.50 and a FRITZ!WLAN Repeater 1750E running FRITZ!OS 7.27.
 
 If you are using the scripts on a different FRITZ!Box model please let me know by
 
@@ -22,7 +22,7 @@ The main differences to the original version are:
 - Add possibility to connect to FRITZ!Box via TLS
 
 ## Requirements
-- FRITZ!Box router with FRITZ!Box!OS >= 07.20
+- FRITZ!Box router with FRITZ!OS >= 07.50 (if you are on an older FRITZ!OS version, select an older version of fritzbox-munin-fast by browsing the tags in this repository)
 - Munin 1.4.0 or later is required
 - Python 3.x
    
@@ -40,6 +40,7 @@ Multigraph plugin, showing:
  - DSL transmission errors
  - line loss
  - link capacity
+ - error correction statistics
  - signal-to-noise ratio
 
 ### CPU & Memory
