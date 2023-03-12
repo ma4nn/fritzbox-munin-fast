@@ -31,24 +31,30 @@ PARAMS = {'update':'mainDiv', 'useajax':1, 'xhr':1}
 
 TITLES = {
   'capacity': 'Link Capacity',
+  'rate': 'Synced Rate',
   'snr': 'Signal-to-Noise Ratio',
   'damping': 'Line Loss',
   'errors': 'Transmission Errors',
-  'crc': 'Checksum Errors'
+  'crc': 'Checksum Errors',
+  'ecc': 'Error Correction'
 }
 TYPES = {
   'capacity': 'GAUGE',
+  'rate': 'GAUGE',
   'snr': 'GAUGE',
   'damping': 'GAUGE',
   'errors': 'DERIVE',
-  'crc': 'GAUGE'
+  'crc': 'GAUGE',
+  'ecc': 'GAUGE'
 }
 VLABELS = {
   'capacity': 'bit/s',
+  'rate': 'bit/s',
   'snr': 'dB',
   'damping': 'dB',
   'errors': 's',
-  'crc': 'n'
+  'crc': 'n',
+  'ecc': 'n',
 }
 
 def get_modes():
@@ -74,6 +80,11 @@ def print_dsl_stats():
     capacity_send = root[1].xpath('tr[position() = 4]/td[position() = 4]')[0].text
     print_graph("dsl_capacity", capacity_recv, capacity_send)
 
+  if 'rate' in modes:
+    rate_recv = root[1].xpath('tr[position() = 5]/td[position() = 3]')[0].text
+    rate_send = root[1].xpath('tr[position() = 5]/td[position() = 4]')[0].text
+    print_graph("dsl_rate", rate_recv, rate_send)
+
   if 'snr' in modes: # Störabstandsmarge
     snr_recv = root[1].xpath('tr[position() = 13]/td[position() = 3]')[0].text
     snr_send = root[1].xpath('tr[position() = 13]/td[position() = 4]')[0].text
@@ -97,6 +108,14 @@ def print_dsl_stats():
     crc_send = root[4].xpath('tr[position() = 7]/td[position() = 3]')[0].text
     print_graph("dsl_crc", crc_recv, crc_send)
 
+  if 'ecc' in modes:
+    corr_recv = root[4].xpath('tr[position() = 11]/td[position() = 2]')[0].text
+    corr_send = root[4].xpath('tr[position() = 11]/td[position() = 3]')[0].text
+    fail_recv = root[4].xpath('tr[position() = 15]/td[position() = 2]')[0].text
+    fail_send = root[4].xpath('tr[position() = 15]/td[position() = 3]')[0].text
+    print_graph("dsl_ecc", corr_recv, corr_send, prefix="corr_")
+    print_graph(None, fail_recv, fail_send, prefix="fail_")
+
 def retrieve_max_values():
   max = {}
   page = 'internet/inetstat_monitor.lua'
@@ -114,7 +133,7 @@ def print_config():
   modes = get_modes()
   max = retrieve_max_values()
 
-  for mode in ['capacity', 'snr', 'damping', 'crc']:
+  for mode in ['capacity', 'rate', 'snr', 'damping', 'crc']:
     if not mode in modes:
       continue
     print("multigraph dsl_" + mode)
@@ -127,7 +146,7 @@ def print_config():
       print(p + ".type " + TYPES[mode])
       print(p + ".graph LINE1")
       print(p + ".min 0")
-      if mode == 'capacity':
+      if mode in ['capacity', 'rate']:
         print(p + ".cdef " + p + ",1000,*")
         print(p + ".warning " + str(max[p]))
 
@@ -141,6 +160,20 @@ def print_config():
     for p,l in {'es_recv' : 'receive errored', 'es_send': 'send errored', 'ses_recv' : 'receive severely errored', 'ses_send': 'send severely errored'}.items():
       print(p + ".label " + l)
       print(p + ".type " + TYPES['errors'])
+      print(p + ".graph LINE1")
+      print(p + ".min 0")
+      print(p + ".warning 1")
+
+  if 'ecc' in modes:
+    print("multigraph dsl_ecc")
+    print("graph_title " + TITLES['ecc'])
+    print("graph_vlabel " + VLABELS['ecc'])
+    print("graph_args --lower-limit 0")
+    print("graph_category network")
+    print("graph_order corr_recv corr_send fail_recv fail_send")
+    for p,l in {'corr_recv' : 'receive corrected', 'corr_send': 'send corrected', 'fail_recv' : 'receive uncorrectable', 'fail_send': 'send uncorrectable'}.items():
+      print(p + ".label " + l)
+      print(p + ".type " + TYPES['ecc'])
       print(p + ".graph LINE1")
       print(p + ".min 0")
       print(p + ".warning 1")
