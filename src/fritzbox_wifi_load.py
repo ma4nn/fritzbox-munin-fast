@@ -27,7 +27,6 @@ from FritzboxInterface import FritzboxInterface
 
 PAGE = 'data.lua'
 PARAMS = {'xhr':1, 'lang':'de', 'page':'chan', 'xhrId':'environment', 'useajax':1, 'no_sidrenew':None}
-PARAMS_INIT = {'xhr':1, 'lang':'de', 'page':'chan', 'xhrId':'setairtime', 'slot':1, 'useajax':1, 'no_sidrenew':None}
 
 def average_load(datapoints):
   """ average send and receive series """
@@ -53,15 +52,17 @@ def print_wifi_load():
 
   # set up the graphs (load the 10-minute view)
   fritzboxHelper = FritzboxInterface()
-  fritzboxHelper.postPageWithLogin(PAGE, data=PARAMS_INIT)
   # download the graphs
   jsondata = fritzboxHelper.postPageWithLogin(PAGE, data=PARAMS)['data']
 
   freqs = get_freqs()
   modes = get_modes()
+  scanlist = jsondata['scanlist']
+
   # parse data from all available frequencies
   for freq in freqs:
-    freqdata = jsondata[freq + 'ghz']
+    band_id = freq + 'ghz'
+    freqdata = jsondata[band_id]
     if freqdata == None:
       continue
     if 'freqs' in modes:
@@ -72,19 +73,19 @@ def print_wifi_load():
       print(freq + 'ghz_recv.value ' + str(average_recv))
       print(freq + 'ghz_send.value ' + str(average_send))
     if 'neighbors' in modes:
-      chans = freqdata['usedChannels']
-      chanData = freqdata['channels']
-
-      total = jsondata['cnt_' + freq]
-      if (isinstance(total, str)):
-        total = int(total.split(' ')[0]) # for FritzOS 7.20|7.21
-
+      own_chans = freqdata['usedChannels']
       sameChan = 0
-      for chan in chanData:
-        num = chan['value']
-        if num in chans:
-          sameChan+=int(chan['envApCount'])
-      otherChans = total - sameChan
+      otherChans = 0
+      for ap in scanlist:
+        # only count APs on the current band
+        if ap['bandId'] != band_id: continue
+        # don't count the FritzBox's own AP
+        if not ap.get('isEnvNet', False): continue
+        chan = ap['channel']
+        if chan in own_chans:
+          sameChan+=1
+        else:
+          otherChans+=1
       print('multigraph neighbors_' + freq + 'ghz')
       print(freq + 'ghz_samechan.value ' + str(sameChan))
       print(freq + 'ghz_otherchans.value ' + str(otherChans))
