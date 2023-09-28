@@ -4,7 +4,7 @@
 """
 
 from unittest.mock import Mock
-from base_test_case import BaseTestCase
+from test_base import BaseTestCase
 from fritzbox_connection_uptime import FritzboxConnectionUptime
 
 def get_fritzstatus_mock() -> Mock:

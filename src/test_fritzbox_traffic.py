@@ -6,7 +6,7 @@
 from unittest.mock import Mock
 import unittest
 from fritzbox_traffic import FritzboxTraffic
-from base_test_case import BaseTestCase
+from test_base import BaseTestCase
 
 def get_fritzstatus_mock() -> Mock:
   mock_fritzstatus = Mock()

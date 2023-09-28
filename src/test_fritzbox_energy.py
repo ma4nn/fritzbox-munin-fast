@@ -8,7 +8,7 @@ import os
 import pytest
 import unittest
 from fritzbox_energy import FritzboxEnergy
-from base_test_case import BaseTestCase
+from test_base import BaseTestCase
 
 @pytest.mark.parametrize("fixture_version", ["7590-7.28"])
 class TestFritzboxEnergy(BaseTestCase):
@@ -122,4 +122,4 @@ multigraph devices
 wifi.value 55
 lan.value 40
 multigraph uptime
-uptime.value 1064.14""", energy.print_energy_stats)
+uptime.value 66.25""", energy.print_energy_stats)

@@ -8,7 +8,7 @@ import os
 import pytest
 import unittest
 from fritzbox_ecostat import FritzboxEcostat
-from base_test_case import BaseTestCase
+from test_base import BaseTestCase
 
 @pytest.mark.parametrize("fixture_version", ["7590-7.28"])
 class TestFritzboxEcostat(BaseTestCase):

@@ -8,7 +8,7 @@ import os
 import unittest
 import pytest
 from fritzbox_dsl import FritzboxDsl
-from base_test_case import BaseTestCase
+from test_base import BaseTestCase
 
 @pytest.mark.parametrize("fixture_version", ["7590-7.57"])
 class TestFritzboxDsl(BaseTestCase):
