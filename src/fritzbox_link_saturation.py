@@ -19,8 +19,6 @@
   #%# capabilities=autoconf
 """
 
-import os
-import re
 import sys
 import json
 from FritzboxInterface import FritzboxInterface
@@ -34,15 +32,15 @@ LABELS_DN = ['internet', 'iptv']
 
 def average_bps(datapoints):
   avg = 0
-  for d in datapoints:
-    avg+=d
+  for datapoint in datapoints:
+    avg+=datapoint
   avg = avg//len(datapoints)
   return avg
 
 def print_link_saturation():
   """get the current DSL link saturation"""
 
-  data = FritzboxInterface().getPageWithLogin(PAGE, data=PARAMS)
+  data = FritzboxInterface().get_page_with_login(PAGE, data=PARAMS)
   # all data is embedded in a one-element array, so strip that array away
   jsondata = json.loads(data)[0]
 
@@ -51,12 +49,12 @@ def print_link_saturation():
   maxdown = int(float(jsondata['downstream']))
 
   print("multigraph saturation_up")
-  for i in range(len(DATA_UP)):
-    print('up_' + LABELS_UP[i] + '.value ' + str(average_bps(jsondata[DATA_UP[i]])))
+  for i, value in enumerate(DATA_UP):
+    print('up_' + LABELS_UP[i] + '.value ' + str(average_bps(jsondata[value])))
   print("maxup.value " + str(maxup))
   print("multigraph saturation_down")
-  for i in range(len(DATA_DN)):
-    print('dn_' + LABELS_DN[i] + '.value ' + str(average_bps(jsondata[DATA_DN[i]])))
+  for i, value in enumerate(DATA_DN):
+    print('dn_' + LABELS_DN[i] + '.value ' + str(average_bps(jsondata[value])))
   print("maxdown.value " + str(maxdown))
 
 def print_config():
@@ -66,11 +64,11 @@ def print_config():
   print("graph_category network")
   print("graph_args --base 1000 --lower-limit 0")
   print("graph_order " + ' '.join(LABELS_UP) + " maxdown")
-  for l in LABELS_UP:
-    print('up_' + l + '.label ' + l)
-    print('up_' + l + '.type GAUGE')
-    print('up_' + l + '.draw AREASTACK')
-    print('up_' + l + '.cdef up_' + l + ',8,*')
+  for label in LABELS_UP:
+    print('up_' + label + '.label ' + label)
+    print('up_' + label + '.type GAUGE')
+    print('up_' + label + '.draw AREASTACK')
+    print('up_' + label + '.cdef up_' + label + ',8,*')
   print("maxup.label MAX")
   print("maxup.type GAUGE")
   print("maxup.graph LINE1")
@@ -81,11 +79,11 @@ def print_config():
   print("graph_category network")
   print("graph_args --base 1000 --lower-limit 0")
   print("graph_order " + ' '.join(LABELS_DN) + " maxup")
-  for l in LABELS_DN:
-    print('dn_' + l + '.label ' + l)
-    print('dn_' + l + '.type GAUGE')
-    print('dn_' + l + '.draw AREASTACK')
-    print('dn_' + l + '.cdef dn_' + l + ',8,*')
+  for label in LABELS_DN:
+    print('dn_' + label + '.label ' + label)
+    print('dn_' + label + '.type GAUGE')
+    print('dn_' + label + '.draw AREASTACK')
+    print('dn_' + label + '.cdef dn_' + label + ',8,*')
   print("maxdown.label MAX")
   print("maxdown.type GAUGE")
   print("maxdown.graph LINE1")

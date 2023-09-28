@@ -34,7 +34,7 @@ def average_load(datapoints):
   recv = 0
   send = 0
   for d in datapoints:
-    parts = d.split(u':')
+    parts = d.split(':')
     recv += int(parts[0])
     send += int(parts[1])
   datalen = len(datapoints)
@@ -52,17 +52,17 @@ def print_wifi_load():
   """get the current wifi bandwidth usage"""
 
   # set up the graphs (load the 10-minute view)
-  fritzboxHelper = FritzboxInterface()
-  fritzboxHelper.postPageWithLogin(PAGE, data=PARAMS_INIT)
+  fritzbox_helper = FritzboxInterface()
+  fritzbox_helper.post_page_with_login(PAGE, data=PARAMS_INIT)
   # download the graphs
-  jsondata = fritzboxHelper.postPageWithLogin(PAGE, data=PARAMS)['data']
+  jsondata = fritzbox_helper.post_page_with_login(PAGE, data=PARAMS)['data']
 
   freqs = get_freqs()
   modes = get_modes()
   # parse data from all available frequencies
   for freq in freqs:
     freqdata = jsondata[freq + 'ghz']
-    if freqdata == None:
+    if freqdata is None:
       continue
     if 'freqs' in modes:
       airtimedata = freqdata['airtimedata']

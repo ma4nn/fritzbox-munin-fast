@@ -29,46 +29,46 @@ import hashlib
 import sys
 import json
 
-import requests
-from lxml import etree
 from typing import Callable
 from json.decoder import JSONDecodeError
+import requests
+from lxml import etree
 from FritzboxConfig import FritzboxConfig
-from FritzboxFileSession import FritzboxFileSession
+from fritzbox_file_session import FritzboxFileSession
 
 class FritzboxInterface:
   config = None
   __session = None
-  __baseUri = ""
+  __base_uri = ""
 
   # default constructor
-  def __init__(self):
-    self.config = FritzboxConfig()
-    self.__session = FritzboxFileSession(self.config.server, self.config.user, self.config.port)
-    self.__baseUri = self.__getBaseUri()
+  def __init__(self, config: FritzboxConfig = None, session: FritzboxFileSession = None):
+    self.config = config if (config) else FritzboxConfig()
+    self.__session = session if (session) else FritzboxFileSession(self.config.server, self.config.user, self.config.port)
+    self.__base_uri = self.__get_base_uri()
 
-  def __getBaseUri(self) -> str:
-    DEFAULT_PORTS = (80, 443)
-    SCHEMES = ('http', 'https')
-    if self.config.port and self.config.port != DEFAULT_PORTS[self.config.useTls]:
-      return '{}://{}:{}'.format(SCHEMES[self.config.useTls], self.config.server, self.config.port)
-    else:
-      return '{}://{}'.format(SCHEMES[self.config.useTls], self.config.server)
+  def __get_base_uri(self) -> str:
+    default_ports = (80, 443)
+    schemes = ('http', 'https')
+    if self.config.port and self.config.port != default_ports[self.config.useTls]:
+      return f"{schemes[self.config.useTls]}://{self.config.server}:{self.config.port}"
 
-  def getPageWithLogin(self, page: str, data={}) -> str:
-    return self.__callPageWithLogin(self.__get, page, data)
+    return f"{schemes[self.config.useTls]}://{self.config.server}"
 
-  def postPageWithLogin(self, page: str, data={}) -> str:
-    data = self.__callPageWithLogin(self.__post, page, data)
+  def get_page_with_login(self, page: str, data={}) -> str:
+    return self.__call_page_with_login(self.__get, page, data)
+
+  def post_page_with_login(self, page: str, data={}) -> dict:
+    data = self.__call_page_with_login(self.__post, page, data)
 
     try:
-      jsonData = json.loads(data)
-    except JSONDecodeError as e:
+      json_data = json.loads(data)
+    except JSONDecodeError as json_exception:
       # Perhaps session expired, let's clear the session and try again
       self.__session.clear_session()
-      sys.exit('ERROR: Did not receive valid JSON data from FritzBox, so automatically cleared the session, please try again.: ' + str(e))
+      sys.exit('ERROR: Did not receive valid JSON data from FritzBox, so automatically cleared the session, please try again.: ' + str(json_exception))
 
-    return jsonData
+    return json_data
 
   # Code from https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/AVM_Technical_Note_-_Session_ID_deutsch_2021-05-03.pdf
   def __calculate_pbkdf2_response(self, challenge) -> str:
@@ -96,7 +96,7 @@ class FritzboxInterface:
     response = challenge + "-" + md5_sum.hexdigest()
     return response
 
-  def __getSessionId(self) -> str:
+  def __get_session_id(self) -> str:
     """Obtains the session id after login into the Fritzbox.
     See https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/AVM_Technical_Note_-_Session_ID.pdf
     for details (in German).
@@ -106,16 +106,16 @@ class FritzboxInterface:
 
     headers = {"Accept": "application/xml", "Content-Type": "text/plain"}
 
-    url = '{}/login_sid.lua?version=2'.format(self.__baseUri)
+    url = f"{self.__base_uri}/login_sid.lua?version=2"
     try:
-      r = requests.get(url, headers=headers, verify=self.config.certificateFile)
-      r.raise_for_status()
+      result = requests.get(url, headers=headers, verify=self.config.certificateFile)
+      result.raise_for_status()
     except (requests.exceptions.HTTPError, requests.exceptions.SSLError) as err:
       print(err)
       sys.exit(1)
 
     params = {}
-    root = etree.fromstring(r.content)
+    root = etree.fromstring(result.content)
     session_id = root.xpath('//SessionInfo/SID/text()')[0]
     if session_id == "0000000000000000":
       challenge = root.xpath('//SessionInfo/Challenge/text()')[0]
@@ -131,15 +131,16 @@ class FritzboxInterface:
 
     headers = {"Accept": "text/html,application/xhtml+xml,application/xml", "Content-Type": "application/x-www-form-urlencoded"}
 
-    url = '{}/login_sid.lua'.format(self.__baseUri)
+    url = f"{self.__base_uri}/login_sid.lua"
     try:
-      r = requests.get(url, headers=headers, params=params, verify=self.config.certificateFile)
-      r.raise_for_status()
+      result = requests.get(url, headers=headers, params=params, verify=self.config.certificateFile)
+      result.raise_for_status()
     except (requests.exceptions.HTTPError, requests.exceptions.SSLError) as err:
       print(err)
       sys.exit(1)
 
-    root = etree.fromstring(r.content)
+    root = etree.fromstring(result.content)
+
     session_id = root.xpath('//SessionInfo/SID/text()')[0]
     if session_id == "0000000000000000":
       print("ERROR: No SID received because of invalid credentials")
@@ -149,20 +150,20 @@ class FritzboxInterface:
 
     return session_id
 
-  def __callPageWithLogin(self, method: Callable[[], str], page, data={}) -> str:
+  def __call_page_with_login(self, method: Callable[[], str], page, data={}) -> str:
     session_id = self.__session.load_session_id()
 
-    if session_id != None:
+    if session_id is not None:
       try:
         return method(session_id, page, data)
       except (requests.exceptions.HTTPError,
-             requests.exceptions.SSLError) as e:
-        code = e.response.status_code
+             requests.exceptions.SSLError) as request_exception:
+        code = request_exception.response.status_code
         if code != 403:
-          print(e)
+          print(request_exception)
           sys.exit(1)
 
-    session_id = self.__getSessionId()
+    session_id = self.__get_session_id()
     return method(session_id, page, data)
 
   def __post(self, session_id, page, data={}) -> str:
@@ -178,12 +179,12 @@ class FritzboxInterface:
 
     headers = {"Accept": "application/json", "Content-Type": "application/x-www-form-urlencoded"}
 
-    url = '{}/{}'.format(self.__baseUri, page)
+    url = f"{self.__base_uri}/{page}"
 
-    r = requests.post(url, headers=headers, data=data, verify=self.config.certificateFile)
-    r.raise_for_status()
+    result = requests.post(url, headers=headers, data=data, verify=self.config.certificateFile)
+    result.raise_for_status()
 
-    return r.content
+    return result.content
 
   def __get(self, session_id, page, data={}) -> str:
     """Fetches a page from the Fritzbox and returns its content
@@ -198,9 +199,9 @@ class FritzboxInterface:
 
     params = data
     params["sid"] = session_id
-    url = '{}/{}'.format(self.__baseUri, page)
+    url = f"{self.__base_uri}/{page}"
 
-    r = requests.get(url, headers=headers, params=params, verify=self.config.certificateFile)
-    r.raise_for_status()
+    result = requests.get(url, headers=headers, params=params, verify=self.config.certificateFile)
+    result.raise_for_status()
 
-    return r.content
+    return result.content

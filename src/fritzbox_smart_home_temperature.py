@@ -5,8 +5,6 @@
   @see https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/x_homeauto.pdf
 """
 
-import os
-import re
 import sys
 from fritzconnection import FritzConnection
 from FritzboxConfig import FritzboxConfig
