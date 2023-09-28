@@ -1,19 +1,17 @@
-import io
 import json
 import os
-import unittest
 from unittest.mock import Mock
-from typing import Callable
-from interface_mock import FritzboxInterfaceMock
 
-class BaseTestCase():
-  version: str
+class FritzboxInterfaceMock(Mock):
+  def __init__(self, version="7590-7.57"): # FritzOS version used
+    super(Mock).__init__()
+    self.version = version
 
-  @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
-  def assert_stdout(self, expected_output, method: Callable[[], str], mock_stdout):
-    method()
-    output = mock_stdout.getvalue()
-    assert expected_output == output.rstrip("\n")
+  def get_page_with_login(self, page: str, data=None) -> str:
+    return self.__side_effect_func_page_with_login(page, data)
+
+  def post_page_with_login(self, page: str, data=None) -> dict:
+    return self.__side_effect_func_page_with_login(page, data)
 
   def __side_effect_func_page_with_login(self, page: str, data) -> dict | str:
     current_dir = os.path.dirname(__file__)
@@ -37,12 +35,3 @@ class BaseTestCase():
       return {"data": {}}
 
     return ''
-
-  def _create_interface_mock(self, fixture_version="7590-7.57") -> FritzboxInterfaceMock:
-    self.version = fixture_version
-
-    mock_interface = Mock()
-    mock_interface.get_page_with_login = Mock(side_effect=self.__side_effect_func_page_with_login)
-    mock_interface.post_page_with_login = Mock(side_effect=self.__side_effect_func_page_with_login)
-
-    return mock_interface

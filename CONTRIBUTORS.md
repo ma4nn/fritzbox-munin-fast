@@ -5,4 +5,4 @@
  - Christian Stade-Schuldt
  - Oliver Edelmann
  - Rene Walendy ([RenWal](https://github.com/RenWal))
- - Christoph Massmann ([christophmassmann](https://github.com/christophmassmann))
+ - Christoph Massmann ([ma4nn](https://github.com/ma4nn))

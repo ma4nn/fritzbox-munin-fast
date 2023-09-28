@@ -24,7 +24,7 @@ The main differences to the original version are:
 ## Requirements
 - FRITZ!Box router with FRITZ!OS >= 07.50 (if you are on an older FRITZ!OS version, select an older version of fritzbox-munin-fast by browsing the tags in this repository)
 - Munin 1.4.0 or later is required
-- Python 3.x
+- Python >= 3.10
    
 ## Available Plugins
 

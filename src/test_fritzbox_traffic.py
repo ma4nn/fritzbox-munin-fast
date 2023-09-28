@@ -5,8 +5,8 @@
 
 from unittest.mock import Mock
 import unittest
-import sys
 from fritzbox_traffic import FritzboxTraffic
+from base_test_case import BaseTestCase
 
 def get_fritzstatus_mock() -> Mock:
   mock_fritzstatus = Mock()
@@ -15,16 +15,14 @@ def get_fritzstatus_mock() -> Mock:
 
   return mock_fritzstatus
 
-class TestFritzboxTraffic(unittest.TestCase):
+class TestFritzboxTraffic(BaseTestCase):
   maxDiff = None
 
   def test_config(self):
     traffic = FritzboxTraffic(get_fritzstatus_mock())
-    traffic.print_config()
 
-    # pylint: disable=no-member
-    output = sys.stdout.getvalue().strip()
-    self.assertEqual(output, """graph_title WAN traffic
+    # pylint: disable=no-value-for-parameter
+    self.assert_stdout("""graph_title WAN traffic
 graph_args --base 1000
 graph_vlabel bit in (-) / out (+) per ${graph_period}
 graph_category network
@@ -50,18 +48,16 @@ maxup.label MAX
 maxup.type GAUGE
 maxup.negative maxdown
 maxup.draw LINE1
-maxup.info Maximum speed of the WAN interface.""")
+maxup.info Maximum speed of the WAN interface.""", traffic.print_config)
 
   def test_traffic(self):
     traffic = FritzboxTraffic(get_fritzstatus_mock())
-    traffic.print_traffic()
 
-    # pylint: disable=no-member
-    output = sys.stdout.getvalue().strip()
-    self.assertEqual(output, """down.value 4373
+    # pylint: disable=no-value-for-parameter
+    self.assert_stdout("""down.value 4373
 up.value 1024
 maxdown.value 1
-maxup.value 182""")
+maxup.value 182""", traffic.print_traffic)
 
 if __name__ == '__main__':
   unittest.main(module=__name__, buffer=True, exit=False)

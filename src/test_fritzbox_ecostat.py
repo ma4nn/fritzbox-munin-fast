@@ -5,34 +5,30 @@
 
 from unittest.mock import Mock
 import os
+import pytest
 import unittest
-import sys
 from fritzbox_ecostat import FritzboxEcostat
-from FritzboxInterface import FritzboxInterface
 from base_test_case import BaseTestCase
 
+@pytest.mark.parametrize("fixture_version", ["7590-7.28"])
 class TestFritzboxEcostat(BaseTestCase):
   @unittest.mock.patch.dict(os.environ, {
     "ecostat_modes": "INVALID"
   })
-  def test_config_with_invalid_modes_only(self):
-    ecostat = FritzboxEcostat(self._get_interface_mock())
-    ecostat.print_config()
+  def test_config_with_invalid_modes_only(self, fixture_version: str):
+    ecostat = FritzboxEcostat(self._create_interface_mock(fixture_version))
 
-    # pylint: disable=no-member
-    output = sys.stdout.getvalue().strip()
-    self.assertEqual(output, "")
+    # pylint: disable=no-value-for-parameter
+    self.assert_stdout("", ecostat.print_config)
 
   @unittest.mock.patch.dict(os.environ, {
     "ecostat_modes": "cpu temp ram INVALID"
   })
-  def test_config(self):
-    dsl = FritzboxEcostat(self._get_interface_mock())
-    dsl.print_config()
+  def test_config(self, fixture_version: str):
+    dsl = FritzboxEcostat(self._create_interface_mock(fixture_version))
 
-    # pylint: disable=no-member
-    output = sys.stdout.getvalue().strip()
-    self.assertEqual(output, """multigraph cpuload
+    # pylint: disable=no-value-for-parameter
+    self.assert_stdout("""multigraph cpuload
 graph_title CPU usage
 graph_vlabel %
 graph_category system
@@ -70,26 +66,20 @@ cache.type GAUGE
 cache.draw AREASTACK
 free.label free
 free.type GAUGE
-free.draw AREASTACK""")
+free.draw AREASTACK""", dsl.print_config)
 
-  def test_print_system_stats(self):
-    dsl = FritzboxEcostat(self._get_interface_mock())
-    dsl.print_system_stats()
+  @unittest.mock.patch.dict(os.environ, {
+    "ecostat_modes": "cpu temp ram INVALID"
+  })
+  def test_print_system_stats(self, fixture_version: str):
+    ecostat = FritzboxEcostat(self._create_interface_mock(fixture_version))
 
-    # pylint: disable=no-member
-    output = sys.stdout.getvalue().strip()
-    self.assertEqual(output, """multigraph cpuload
+    # pylint: disable=no-value-for-parameter
+    self.assert_stdout("""multigraph cpuload
 load.value 10
 multigraph cputemp
 temp.value 71
 multigraph ramusage
 strict.value 17
 cache.value 32.9
-free.value 50.1""")
-
-if __name__ == '__main__':
-  suite = unittest.TestSuite()
-  for fritzbox_model in ['7590-7.28']:
-    suite.addTest(BaseTestCase.parametrize(TestFritzboxEcostat, param=fritzbox_model))
-
-  unittest.TextTestRunner(verbosity=2, buffer=True).run(suite)
+free.value 50.1""", ecostat.print_system_stats)

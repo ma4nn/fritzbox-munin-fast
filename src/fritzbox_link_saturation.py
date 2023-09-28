@@ -20,7 +20,6 @@
 """
 
 import sys
-import json
 from FritzboxInterface import FritzboxInterface
 
 PAGE = 'data.lua'
@@ -41,7 +40,7 @@ def average_bps(datapoints):
 def print_link_saturation():
   """get the current DSL link saturation"""
 
-  jsondata = FritzboxInterface().post_age_with_login(PAGE, data=PARAMS)["data"]["sync_groups"][0]
+  jsondata = FritzboxInterface().post_page_with_login(PAGE, data=PARAMS)["data"]["sync_groups"][0]
 
   maxup = int(jsondata['upstream'])
   maxdown = int(jsondata['downstream'])

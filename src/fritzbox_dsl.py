@@ -22,12 +22,10 @@
 
 import os
 import sys
-import json
-from lxml import html
 from FritzboxInterface import FritzboxInterface
 
-PAGE = 'internet/dsl_stats_tab.lua'
-PARAMS = {'update':'mainDiv', 'useajax':1, 'xhr':1}
+PAGE = 'data.lua'
+PARAMS = {'xhr':1, 'lang':'de', 'page':'dslStat', 'xhrId':'refresh', 'useajax':1, 'no_sidrenew':None}
 
 TITLES = {
   'capacity': 'Link Capacity',
@@ -57,87 +55,68 @@ VLABELS = {
   'ecc': 'n',
 }
 
+def get_modes():
+  return os.getenv('dsl_modes').split(' ') if (os.getenv('dsl_modes')) else []
+
+def print_graph(name, recv, send, prefix=""):
+  if name:
+    print("multigraph " + name)
+  print(prefix + "recv.value " + recv)
+  print(prefix + "send.value " + send)
+
 class FritzboxDsl:
   __connection = None
 
-  def __init__(self, fritzboxInterface: FritzboxInterface = None):
-    self.__connection = fritzboxInterface if (fritzboxInterface) else FritzboxInterface()
-
-  def get_modes(self):
-    return os.getenv('dsl_modes').split(' ') if (os.getenv('dsl_modes')) else []
-
-  def print_graph(self, name, recv, send, prefix=""):
-    if name:
-      print("multigraph " + name)
-    print(prefix + "recv.value " + recv)
-    print(prefix + "send.value " + send)
+  def __init__(self, fritzbox_interface: FritzboxInterface = None):
+    self.__connection = fritzbox_interface if (fritzbox_interface) else FritzboxInterface()
 
   def print_dsl_stats(self):
     """print the current DSL statistics"""
 
-    modes = self.get_modes()
+    modes = get_modes()
+    jsondata = self.__connection.post_page_with_login(PAGE, data=PARAMS)['data']
 
-    # download the table
-    data = self.__connection.get_page_with_login(PAGE, data=PARAMS)
-    root = html.fragments_fromstring(data)
+    # us=upstream, ds=downstream
 
     if 'capacity' in modes:
-      capacity_recv = root[1].xpath('tr[position() = 4]/td[position() = 3]')[0].text
-      capacity_send = root[1].xpath('tr[position() = 4]/td[position() = 4]')[0].text
-      self.print_graph("dsl_capacity", capacity_recv, capacity_send)
+      print_graph("dsl_capacity", jsondata['negotiatedValues'][2]['val'][0]['ds'], jsondata['negotiatedValues'][2]['val'][0]['us'])
 
     if 'rate' in modes:
-      rate_recv = root[1].xpath('tr[position() = 5]/td[position() = 3]')[0].text
-      rate_send = root[1].xpath('tr[position() = 5]/td[position() = 4]')[0].text
-      self.print_graph("dsl_rate", rate_recv, rate_send)
+      print_graph("dsl_rate", jsondata['negotiatedValues'][3]['val'][0]['ds'], jsondata['negotiatedValues'][3]['val'][0]['us'])
 
     if 'snr' in modes: # Störabstandsmarge
-      snr_recv = root[1].xpath('tr[position() = 13]/td[position() = 3]')[0].text
-      snr_send = root[1].xpath('tr[position() = 13]/td[position() = 4]')[0].text
-      self.print_graph("dsl_snr", snr_recv, snr_send)
+      print_graph("dsl_snr", jsondata['negotiatedValues'][12]['val'][0]['ds'], jsondata['negotiatedValues'][12]['val'][0]['us'])
 
     if 'damping' in modes: # Leitungsdämpfung
-      damping_recv = root[1].xpath('tr[position() = 15]/td[position() = 3]')[0].text
-      damping_send = root[1].xpath('tr[position() = 15]/td[position() = 4]')[0].text
-      self.print_graph("dsl_damping", damping_recv, damping_send)
+      print_graph("dsl_damping", jsondata['negotiatedValues'][13]['val'][0]['ds'], jsondata['negotiatedValues'][13]['val'][0]['us'])
 
     if 'errors' in modes:
-      es_recv = root[4].xpath('tr[position() = 3]/td[position() = 2]')[0].text
-      es_send = root[4].xpath('tr[position() = 3]/td[position() = 3]')[0].text
-      ses_recv = root[4].xpath('tr[position() = 4]/td[position() = 2]')[0].text
-      ses_send = root[4].xpath('tr[position() = 4]/td[position() = 3]')[0].text
-      self.print_graph("dsl_errors", es_recv, es_send, prefix="es_")
-      self.print_graph(None, ses_recv, ses_send, prefix="ses_")
+      print_graph("dsl_errors", jsondata['errorCounters'][1]['val'][0]['ds'], jsondata['errorCounters'][1]['val'][0]['us'], prefix="es_")
+      print_graph(None, jsondata['errorCounters'][2]['val'][0]['ds'], jsondata['errorCounters'][2]['val'][0]['us'], prefix="ses_")
 
     if 'crc' in modes:
-      crc_recv = root[4].xpath('tr[position() = 7]/td[position() = 2]')[0].text
-      crc_send = root[4].xpath('tr[position() = 7]/td[position() = 3]')[0].text
-      self.print_graph("dsl_crc", crc_recv, crc_send)
+      print_graph("dsl_crc", jsondata['errorCounters'][5]['val'][0]['ds'], jsondata['errorCounters'][1]['val'][0]['us'])
 
     if 'ecc' in modes:
-      corr_recv = root[4].xpath('tr[position() = 11]/td[position() = 2]')[0].text
-      corr_send = root[4].xpath('tr[position() = 11]/td[position() = 3]')[0].text
-      fail_recv = root[4].xpath('tr[position() = 15]/td[position() = 2]')[0].text
-      fail_send = root[4].xpath('tr[position() = 15]/td[position() = 3]')[0].text
-      self.print_graph("dsl_ecc", corr_recv, corr_send, prefix="corr_")
-      self.print_graph(None, fail_recv, fail_send, prefix="fail_")
+      print_graph("dsl_ecc", jsondata['errorCounters'][9]['val'][0]['ds'], jsondata['errorCounters'][9]['val'][0]['us'], prefix="corr_")
+      print_graph(None, jsondata['errorCounters'][13]['val'][0]['ds'], jsondata['errorCounters'][13]['val'][0]['us'], prefix="fail_")
 
   def retrieve_max_values(self):
-    max = {}
-    page = 'internet/inetstat_monitor.lua'
-    params = {'useajax':1, 'action':'get_graphic', 'xhr':1, 'myXhr':1}
-    data = self.__connection.get_page_with_login(page, data=params)
+    max_values = {'send': 0, 'recv': 0}
+    jsondata = self.__connection.post_page_with_login(PAGE, data=PARAMS)['data']
 
-    # Retrieve max values
-    jsondata = json.loads(data)[0]
-    max['send'] = int(float(jsondata['upstream']))
-    max['recv'] = int(float(jsondata['downstream']))
+    if not 'negotiatedValues' in jsondata:
+      return max_values
 
-    return max
+    # retrieve values from "Leitungskapazitaet"
+    max_values['send'] = int(float(jsondata['negotiatedValues'][2]['val'][0]['us']))
+    max_values['recv'] = int(float(jsondata['negotiatedValues'][2]['val'][0]['ds']))
+
+    return max_values
 
   def print_config(self):
-    modes = self.get_modes()
-    max = self.retrieve_max_values()
+    modes = get_modes()
+    max_values = self.retrieve_max_values()
 
     for mode in ['capacity', 'rate', 'snr', 'damping', 'crc']:
       if not mode in modes:
@@ -154,7 +133,7 @@ class FritzboxDsl:
         print(p + ".min 0")
         if mode in ['capacity', 'rate']:
           print(p + ".cdef " + p + ",1000,*")
-          print(p + ".warning " + str(max[p]))
+          print(p + ".warning " + str(max_values[p]))
 
     if 'errors' in modes:
       print("multigraph dsl_errors")
@@ -163,7 +142,7 @@ class FritzboxDsl:
       print("graph_args --lower-limit 0")
       print("graph_category network")
       print("graph_order es_recv es_send ses_recv ses_send")
-      for p,l in {'es_recv' : 'receive errored', 'es_send': 'send errored', 'ses_recv' : 'receive severely errored', 'ses_send': 'send severely errored'}.items():
+      for p, l in {'es_recv': 'receive errored', 'es_send': 'send errored', 'ses_recv': 'receive severely errored', 'ses_send': 'send severely errored'}.items():
         print(p + ".label " + l)
         print(p + ".type " + TYPES['errors'])
         print(p + ".graph LINE1")
@@ -177,12 +156,13 @@ class FritzboxDsl:
       print("graph_args --lower-limit 0")
       print("graph_category network")
       print("graph_order corr_recv corr_send fail_recv fail_send")
-      for p,l in {'corr_recv' : 'receive corrected', 'corr_send': 'send corrected', 'fail_recv' : 'receive uncorrectable', 'fail_send': 'send uncorrectable'}.items():
+      for p, l in {'corr_recv' : 'receive corrected', 'corr_send': 'send corrected', 'fail_recv' : 'receive uncorrectable', 'fail_send': 'send uncorrectable'}.items():
         print(p + ".label " + l)
         print(p + ".type " + TYPES['ecc'])
         print(p + ".graph LINE1")
         print(p + ".min 0")
         print(p + ".warning 1")
+
 
 if __name__ == "__main__":
   dsl = FritzboxDsl()
@@ -192,4 +172,7 @@ if __name__ == "__main__":
   elif len(sys.argv) == 2 and sys.argv[1] == 'autoconf':
     print("yes")  # Some docs say it'll be called with fetch, some say no arg at all
   elif len(sys.argv) == 1 or (len(sys.argv) == 2 and sys.argv[1] == 'fetch'):
-    dsl.print_dsl_stats()
+    try:
+      dsl.print_dsl_stats()
+    except Exception as e:
+      sys.exit("Couldn't retrieve fritzbox dsl stats: " + str(e))

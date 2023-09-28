@@ -55,10 +55,14 @@ class FritzboxInterface:
 
     return f"{schemes[self.config.useTls]}://{self.config.server}"
 
-  def get_page_with_login(self, page: str, data={}) -> str:
+  def get_page_with_login(self, page: str, data=None) -> str:
+    if data is None:
+      data = {}
     return self.__call_page_with_login(self.__get, page, data)
 
-  def post_page_with_login(self, page: str, data={}) -> dict:
+  def post_page_with_login(self, page: str, data=None) -> dict:
+    if data is None:
+      data = {}
     data = self.__call_page_with_login(self.__post, page, data)
 
     try:
@@ -150,7 +154,9 @@ class FritzboxInterface:
 
     return session_id
 
-  def __call_page_with_login(self, method: Callable[[], str], page, data={}) -> str:
+  def __call_page_with_login(self, method: Callable[[], str], page, data=None) -> str:
+    if data is None:
+      data = {}
     session_id = self.__session.load_session_id()
 
     if session_id is not None:
@@ -166,7 +172,7 @@ class FritzboxInterface:
     session_id = self.__get_session_id()
     return method(session_id, page, data)
 
-  def __post(self, session_id, page, data={}) -> str:
+  def __post(self, session_id, page, data=None) -> str:
     """Sends a POST request to the Fritzbox and returns the response
 
     :param session_id: a valid session id
@@ -175,6 +181,8 @@ class FritzboxInterface:
     :return: the content of the page
     """
 
+    if data is None:
+      data = {}
     data['sid'] = session_id
 
     headers = {"Accept": "application/json", "Content-Type": "application/x-www-form-urlencoded"}
@@ -184,9 +192,9 @@ class FritzboxInterface:
     result = requests.post(url, headers=headers, data=data, verify=self.config.certificateFile)
     result.raise_for_status()
 
-    return result.content
+    return str(result.content)
 
-  def __get(self, session_id, page, data={}) -> str:
+  def __get(self, session_id, page, data=None) -> str:
     """Fetches a page from the Fritzbox and returns its content
 
     :param session_id: a valid session id
@@ -195,6 +203,8 @@ class FritzboxInterface:
     :return: the content of the page
     """
 
+    if data is None:
+      data = {}
     headers = {"Accept": "application/xml", "Content-Type": "text/plain"}
 
     params = data
@@ -204,4 +214,4 @@ class FritzboxInterface:
     result = requests.get(url, headers=headers, params=params, verify=self.config.certificateFile)
     result.raise_for_status()
 
-    return result.content
+    return str(result.content)

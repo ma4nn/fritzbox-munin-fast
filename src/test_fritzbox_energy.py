@@ -5,34 +5,41 @@
 
 from unittest.mock import Mock
 import os
+import pytest
 import unittest
-import sys
 from fritzbox_energy import FritzboxEnergy
-from FritzboxInterface import FritzboxInterface
 from base_test_case import BaseTestCase
 
+@pytest.mark.parametrize("fixture_version", ["7590-7.28"])
 class TestFritzboxEnergy(BaseTestCase):
   @unittest.mock.patch.dict(os.environ, {
-    "energy_modes": "INVALID"
+    "energy_modes": "INVALID",
+    "energy_product": "DSL"
   })
-  def test_config_with_invalid_modes_only(self):
-    ecostat = FritzboxEnergy(self._get_interface_mock())
-    ecostat.print_config()
+  def test_config_with_invalid_modes_only(self, fixture_version: str):
+    ecostat = FritzboxEnergy(self._create_interface_mock(fixture_version))
 
-    # pylint: disable=no-member
-    output = sys.stdout.getvalue().strip()
-    self.assertEqual(output, "")
+    # pylint: disable=no-value-for-parameter
+    self.assert_stdout("", ecostat.print_config)
 
   @unittest.mock.patch.dict(os.environ, {
-    "energy_modes": "power devices uptime INVALID"
+    "energy_modes": "INVALID",
+    "energy_product": "INVALID"
   })
-  def test_config(self):
-    dsl = FritzboxEnergy(self._get_interface_mock())
-    dsl.print_config()
+  def test_config_with_invalid_type(self, fixture_version: str):
+    energy = FritzboxEnergy(self._create_interface_mock(fixture_version))
 
-    # pylint: disable=no-member
-    output = sys.stdout.getvalue().strip()
-    self.assertEqual(output, """multigraph power
+    pytest.raises(Exception, energy.print_config)
+
+  @unittest.mock.patch.dict(os.environ, {
+    "energy_modes": "power devices uptime INVALID",
+    "energy_product": "DSL"
+  })
+  def test_config(self, fixture_version: str):
+    energy = FritzboxEnergy(self._create_interface_mock(fixture_version))
+
+    # pylint: disable=no-value-for-parameter
+    self.assert_stdout("""multigraph power
 graph_title Power Consumption
 graph_vlabel %
 graph_args --lower-limit 0 --upper-limit 100 --rigid
@@ -94,15 +101,17 @@ graph_args --base 1000 -l 0
 graph_scale no
 graph_category system
 uptime.label uptime
-uptime.draw AREA""")
+uptime.draw AREA""", energy.print_config)
 
-  def test_print_energy_stats(self):
-    dsl = FritzboxEnergy(self._get_interface_mock())
-    dsl.print_energy_stats()
+  @unittest.mock.patch.dict(os.environ, {
+    "energy_modes": "power devices uptime INVALID",
+    "energy_product": "DSL"
+  })
+  def test_print_energy_stats(self, fixture_version: str):
+    energy = FritzboxEnergy(self._create_interface_mock(fixture_version))
 
-    # pylint: disable=no-member
-    output = sys.stdout.getvalue().strip()
-    self.assertEqual(output, """multigraph power
+    # pylint: disable=no-value-for-parameter
+    self.assert_stdout("""multigraph power
 system.value 24
 cpu.value 67
 wifi.value 57
@@ -113,11 +122,4 @@ multigraph devices
 wifi.value 55
 lan.value 40
 multigraph uptime
-uptime.value 1064.14""")
-
-if __name__ == '__main__':
-  suite = unittest.TestSuite()
-  for fritzbox_model in ['7590-7.28']:
-    suite.addTest(BaseTestCase.parametrize(TestFritzboxEnergy, param=fritzbox_model))
-
-  unittest.TextTestRunner(verbosity=2, buffer=True).run(suite)
+uptime.value 1064.14""", energy.print_energy_stats)

@@ -6,33 +6,29 @@
 from unittest.mock import Mock
 import os
 import unittest
-import sys
+import pytest
 from fritzbox_dsl import FritzboxDsl
-from FritzboxInterface import FritzboxInterface
 from base_test_case import BaseTestCase
 
+@pytest.mark.parametrize("fixture_version", ["7590-7.57"])
 class TestFritzboxDsl(BaseTestCase):
   @unittest.mock.patch.dict(os.environ, {
     "dsl_modes": "INVALID"
   })
-  def test_config_with_invalid_modes_only(self):
-    dsl = FritzboxDsl(self._get_interface_mock())
-    dsl.print_config()
+  def test_config_with_invalid_modes_only(self, fixture_version: str):
+    dsl = FritzboxDsl(self._create_interface_mock(fixture_version))
 
-    # pylint: disable=no-member
-    output = sys.stdout.getvalue().strip()
-    self.assertEqual(output, "")
+    # pylint: disable=no-value-for-parameter
+    self.assert_stdout("", dsl.print_config)
 
   @unittest.mock.patch.dict(os.environ, {
     "dsl_modes": "capacity snr damping errors crc INVALID"
   })
-  def test_config(self):
-    dsl = FritzboxDsl(self._get_interface_mock())
-    dsl.print_config()
+  def test_config(self, fixture_version: str):
+    dsl = FritzboxDsl(self._create_interface_mock(fixture_version))
 
-    # pylint: disable=no-member
-    output = sys.stdout.getvalue().strip()
-    self.assertEqual(output, """multigraph dsl_capacity
+    # pylint: disable=no-value-for-parameter
+    self.assert_stdout("""multigraph dsl_capacity
 graph_title Link Capacity
 graph_vlabel bit/s
 graph_args --lower-limit 0
@@ -42,13 +38,13 @@ recv.type GAUGE
 recv.graph LINE1
 recv.min 0
 recv.cdef recv,1000,*
-recv.warning 61732000
+recv.warning 139083
 send.label send
 send.type GAUGE
 send.graph LINE1
 send.min 0
 send.cdef send,1000,*
-send.warning 12443000
+send.warning 47102
 multigraph dsl_snr
 graph_title Signal-to-Noise Ratio
 graph_vlabel dB
@@ -113,15 +109,16 @@ ses_send.label send severely errored
 ses_send.type DERIVE
 ses_send.graph LINE1
 ses_send.min 0
-ses_send.warning 1""")
+ses_send.warning 1""", dsl.print_config)
 
-  def test_print_dsl_stats(self):
-    dsl = FritzboxDsl(self._get_interface_mock())
-    dsl.print_dsl_stats()
+  @unittest.mock.patch.dict(os.environ, {
+    "dsl_modes": "capacity snr damping errors crc INVALID"
+  })
+  def test_print_dsl_stats(self, fixture_version: str):
+    dsl = FritzboxDsl(self._create_interface_mock(fixture_version))
 
-    # pylint: disable=no-member
-    output = sys.stdout.getvalue().strip()
-    self.assertEqual(output, """multigraph dsl_capacity
+    # pylint: disable=no-value-for-parameter
+    self.assert_stdout("""multigraph dsl_capacity
 recv.value 139083
 send.value 47102
 multigraph dsl_snr
@@ -137,11 +134,4 @@ ses_recv.value 0
 ses_send.value 0
 multigraph dsl_crc
 recv.value 0
-send.value 0""")
-
-if __name__ == '__main__':
-  suite = unittest.TestSuite()
-  for fritzbox_model in ['7590-7.28']:
-    suite.addTest(BaseTestCase.parametrize(TestFritzboxDsl, param=fritzbox_model))
-
-  unittest.TextTestRunner(verbosity=2, buffer=True).run(suite)
+send.value 0""", dsl.print_dsl_stats)
