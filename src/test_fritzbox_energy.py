@@ -5,8 +5,8 @@
 
 from unittest.mock import Mock
 import os
-import pytest
 import unittest
+import pytest
 from fritzbox_energy import FritzboxEnergy
 from test_base import BaseTestCase
 

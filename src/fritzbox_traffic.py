@@ -28,8 +28,8 @@ from fritzbox_config import FritzboxConfig
 class FritzboxTraffic:
   __connection = None
 
-  def __init__(self, fritzStatusConnection: FritzStatus):
-    self.__connection = fritzStatusConnection
+  def __init__(self, fritzstatus_connection: FritzStatus):
+    self.__connection = fritzstatus_connection
 
   def print_traffic(self):
     transmission_rate = self.__connection.transmission_rate

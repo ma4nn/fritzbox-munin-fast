@@ -5,6 +5,8 @@ import unittest
 from unittest.mock import Mock
 from typing import Callable
 
+
+# pylint: disable=too-few-public-methods
 class BaseTestCase():
   version: str
 
@@ -15,24 +17,27 @@ class BaseTestCase():
     assert expected_output == output.rstrip("\n")
 
   def __side_effect_func_page_with_login(self, page: str, data) -> dict | str:
-    current_dir = os.path.dirname(__file__)
+    file_dir = f"{os.path.dirname(__file__)}/fixtures/fritzbox{self.version}"
 
+    if page == 'internet/dsl_stats_tab.lua':
+      with open(file_dir + "/dsl_stats_tab_lua.html", "r", encoding="utf-8") as file:
+        return file.read()
+
+    file_name = None
     if page == 'internet/inetstat_monitor.lua':
-      file = open(f"{current_dir}/fixtures/fritzbox{self.version}/inetstat_monitor_lua.json", "r")
-      return json.load(file)
-    elif page == 'internet/dsl_stats_tab.lua':
-      file = open(f"{current_dir}/fixtures/fritzbox{self.version}/dsl_stats_tab_lua.html", "r")
-      return file.read()
+      file_name = "inetstat_monitor_lua.json"
     elif page == 'data.lua' and data['page'] == 'ecoStat':
-      file = open(f"{current_dir}/fixtures/fritzbox{self.version}/ecostat_data_lua.json", "r")
-      return json.load(file)
+      file_name = "ecostat_data_lua.json"
     elif page == 'data.lua' and data['page'] == 'energy':
-      file = open(f"{current_dir}/fixtures/fritzbox{self.version}/energy_data_lua.json", "r")
-      return json.load(file)
+      file_name = "energy_data_lua.json"
     elif page == 'data.lua' and data['page'] == 'dslStat':
-      file = open(f"{current_dir}/fixtures/fritzbox{self.version}/dsl_data_lua.json", "r")
-      return json.load(file)
-    elif page == 'data.lua':
+      file_name = "dsl_data_lua.json"
+
+    if file_name is not None:
+      with open(file_dir + "/" + file_name, "r", encoding="utf-8") as file:
+        return json.load(file)
+
+    if page == 'data.lua':
       return {"data": {}}
 
     return ''

@@ -55,13 +55,9 @@ class FritzboxInterface:
     return f"{schemes[self.config.use_tls]}://{self.config.server}"
 
   def get_page_with_login(self, page: str, data=None) -> str:
-    if data is None:
-      data = {}
     return self.__call_page_with_login(self.__get, page, data)
 
   def post_page_with_login(self, page: str, data=None) -> dict:
-    if data is None:
-      data = {}
     data = self.__call_page_with_login(self.__post, page, data)
 
     try:
@@ -111,10 +107,8 @@ class FritzboxInterface:
 
     headers = {"Accept": "application/xml", "Content-Type": "text/plain"}
 
-    url = f"{self.__base_uri}/login_sid.lua?version=2"
     try:
-      result = requests.get(url, headers=headers, verify=self.config.certificate_file)
-      result.raise_for_status()
+      result = self.__send_request("get", "login_sid.lua?version=2", headers=headers)
     except (requests.exceptions.HTTPError, requests.exceptions.SSLError) as err:
       print(err)
       sys.exit(1)
@@ -136,10 +130,8 @@ class FritzboxInterface:
 
     headers = {"Accept": "text/html,application/xhtml+xml,application/xml", "Content-Type": "application/x-www-form-urlencoded"}
 
-    url = f"{self.__base_uri}/login_sid.lua"
     try:
-      result = requests.get(url, headers=headers, params=params, verify=self.config.certificate_file)
-      result.raise_for_status()
+      result = self.__send_request("get", "login_sid.lua", headers=headers, params=params)
     except (requests.exceptions.HTTPError, requests.exceptions.SSLError) as err:
       print(err)
       sys.exit(1)
@@ -174,7 +166,7 @@ class FritzboxInterface:
 
     return method(session_id, page, data)
 
-  def __post(self, session_id, page, data=None) -> str:
+  def __post(self, session_id: str, page: str, data=None) -> str:
     """Sends a POST request to the Fritzbox and returns the response
 
     :param session_id: a valid session id
@@ -189,14 +181,11 @@ class FritzboxInterface:
 
     headers = {"Accept": "application/json", "Content-Type": "application/x-www-form-urlencoded"}
 
-    url = f"{self.__base_uri}/{page}"
-
-    result = requests.post(url, headers=headers, data=data, verify=self.config.certificate_file)
-    result.raise_for_status()
+    result = self.__send_request('post', page, headers=headers, data=data)
 
     return result.text
 
-  def __get(self, session_id, page, data=None) -> str:
+  def __get(self, session_id: str, page: str, data=None) -> str:
     """Fetches a page from the Fritzbox and returns its content
 
     :param session_id: a valid session id
@@ -207,13 +196,16 @@ class FritzboxInterface:
 
     if data is None:
       data = {}
+    data["sid"] = session_id
+
     headers = {"Accept": "application/xml", "Content-Type": "text/plain"}
 
-    params = data
-    params["sid"] = session_id
-    url = f"{self.__base_uri}/{page}"
-
-    result = requests.get(url, headers=headers, params=params, verify=self.config.certificate_file)
-    result.raise_for_status()
+    result = self.__send_request('get', page, params=data, headers=headers)
 
     return result.text
+
+  def __send_request(self, method: str, page: str, **kwargs) -> requests.Response:
+    result = requests.request(method, f"{self.__base_uri}/{page}", **kwargs, verify=self.config.certificate_file, timeout=self.config.timeout)
+    result.raise_for_status()
+
+    return result

@@ -1,5 +1,6 @@
 import os
 
+# pylint: disable=too-few-public-methods
 class FritzboxConfig:
   """the server address of the Fritzbox (ip or name)"""
   server = "fritz.box"
@@ -11,6 +12,7 @@ class FritzboxConfig:
   password = ""
   use_tls = True
   certificate_file = str(os.getenv('MUNIN_CONFDIR')) + '/box.cer'
+  timeout = 60
 
   def __init__(self):
     if os.getenv('fritzbox_ip'):

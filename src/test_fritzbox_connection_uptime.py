@@ -27,4 +27,3 @@ class TestFritzboxConnectionUptime(BaseTestCase):
 
     # pylint: disable=no-value-for-parameter
     self.assert_stdout('uptime.value 5.20', uptime.print_uptime)
-

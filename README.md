@@ -1,6 +1,6 @@
 # Munin Plugins for FRITZ!Box
 
-A collection of munin plugins to monitor your AVM FRITZ!Box router. The scripts have been developed using a FRITZ!Box 7590 running FRITZ!OS 7.50 and a FRITZ!WLAN Repeater 1750E running FRITZ!OS 7.27.
+A collection of Munin plugins to monitor your AVM FRITZ!Box router. The scripts have been developed using a FRITZ!Box 7590 running FRITZ!OS 7.50 and a FRITZ!WLAN Repeater 1750E running FRITZ!OS 7.27.
 
 If you are using the scripts on a different FRITZ!Box model please let me know by
 
@@ -146,9 +146,5 @@ munin-run --debug fritzbox_connection_uptime.py
 
 Run all unit tests with
 ```
-python3 -m unittest -b
-```
-or a single unit test with
-```
-python3 -m unittest -b test/test_fritzbox_dsl.py
+pytest
 ```
