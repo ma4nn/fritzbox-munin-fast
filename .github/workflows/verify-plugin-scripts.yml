@@ -1,4 +1,4 @@
-name: Verify Scripts
+name: Verify Plugin Scripts
 
 on: [push,workflow_dispatch,pull_request]
 
