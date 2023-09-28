@@ -7,7 +7,7 @@
 
 import sys
 from fritzconnection import FritzConnection
-from FritzboxConfig import FritzboxConfig
+from fritzbox_config import FritzboxConfig
 
 def printSmartHomeTemperature():
   """get the current cpu temperature"""

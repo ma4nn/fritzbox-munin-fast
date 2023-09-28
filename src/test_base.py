@@ -4,7 +4,6 @@ import os
 import unittest
 from unittest.mock import Mock
 from typing import Callable
-from interface_mock import FritzboxInterfaceMock
 
 class BaseTestCase():
   version: str
@@ -38,7 +37,7 @@ class BaseTestCase():
 
     return ''
 
-  def _create_interface_mock(self, fixture_version="7590-7.57") -> FritzboxInterfaceMock:
+  def _create_interface_mock(self, fixture_version="7590-7.57") -> Mock:
     self.version = fixture_version
 
     mock_interface = Mock()

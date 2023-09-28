@@ -22,7 +22,7 @@
 
 import os
 import sys
-from FritzboxInterface import FritzboxInterface
+from fritzbox_interface import FritzboxInterface
 
 PAGE = 'data.lua'
 PARAMS = {'xhr':1, 'lang':'de', 'page':'dslStat', 'xhrId':'refresh', 'useajax':1, 'no_sidrenew':None}

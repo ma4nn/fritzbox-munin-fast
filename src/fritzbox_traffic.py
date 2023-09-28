@@ -23,7 +23,7 @@ import os
 import sys
 from fritzconnection.lib.fritzstatus import FritzStatus
 from fritzconnection.core.exceptions import FritzConnectionException
-from FritzboxConfig import FritzboxConfig
+from fritzbox_config import FritzboxConfig
 
 class FritzboxTraffic:
   __connection = None

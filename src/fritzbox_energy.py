@@ -24,7 +24,7 @@
 import os
 import re
 import sys
-from FritzboxInterface import FritzboxInterface
+from fritzbox_interface import FritzboxInterface
 
 PAGE = 'data.lua'
 PARAMS = {'xhr':1, 'lang':'de', 'page':'energy', 'xhrId':'all', 'useajax':1, 'no_sidrenew':None}

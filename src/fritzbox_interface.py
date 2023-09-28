@@ -33,7 +33,7 @@ from typing import Callable
 from json.decoder import JSONDecodeError
 import requests
 from lxml import etree
-from FritzboxConfig import FritzboxConfig
+from fritzbox_config import FritzboxConfig
 from fritzbox_file_session import FritzboxFileSession
 
 class FritzboxInterface:

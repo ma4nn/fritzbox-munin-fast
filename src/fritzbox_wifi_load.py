@@ -23,7 +23,7 @@
 
 import os
 import sys
-from FritzboxInterface import FritzboxInterface
+from fritzbox_interface import FritzboxInterface
 
 PAGE = 'data.lua'
 PARAMS = {'xhr':1, 'lang':'de', 'page':'chan', 'xhrId':'environment', 'useajax':1, 'no_sidrenew':None}
