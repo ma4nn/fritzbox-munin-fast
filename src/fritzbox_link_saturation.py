@@ -23,8 +23,9 @@ import sys
 import json
 from FritzboxInterface import FritzboxInterface
 
-PAGE = 'internet/inetstat_monitor.lua'
-PARAMS = {'useajax':1, 'action':'get_graphic', 'xhr':1, 'myXhr':1}
+PAGE = 'data.lua'
+PARAMS = {'xhr':1, 'lang':'de', 'page':'netMoni', 'xhrId':'updateGraphs', 'useajax':1, 'no_sidrenew':None}
+
 DATA_UP   = ['us_realtime_bps_curr', 'us_important_bps_curr', 'us_default_bps_curr', 'us_background_bps_curr']
 LABELS_UP = ['realtime', 'high', 'default', 'low']
 DATA_DN   = ['ds_bps_curr', 'ds_mc_bps_curr']
@@ -40,13 +41,10 @@ def average_bps(datapoints):
 def print_link_saturation():
   """get the current DSL link saturation"""
 
-  data = FritzboxInterface().get_page_with_login(PAGE, data=PARAMS)
-  # all data is embedded in a one-element array, so strip that array away
-  jsondata = json.loads(data)[0]
+  jsondata = FritzboxInterface().post_age_with_login(PAGE, data=PARAMS)["data"]["sync_groups"][0]
 
-  # parse scientific notations of integers
-  maxup = int(float(jsondata['upstream']))
-  maxdown = int(float(jsondata['downstream']))
+  maxup = int(jsondata['upstream'])
+  maxdown = int(jsondata['downstream'])
 
   print("multigraph saturation_up")
   for i, value in enumerate(DATA_UP):
