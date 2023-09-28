@@ -52,7 +52,6 @@ def print_wifi_load():
 
   # set up the graphs (load the 10-minute view)
   fritzbox_helper = FritzboxInterface()
-  fritzbox_helper.post_page_with_login(PAGE, data=PARAMS_INIT)
 
   # download the graphs
   jsondata = fritzbox_helper.post_page_with_login(PAGE, data=PARAMS)['data']
@@ -63,7 +62,6 @@ def print_wifi_load():
 
   # parse data from all available frequencies
   for freq in freqs:
-
     band_id = freq + 'ghz'
     freqdata = jsondata[band_id]
     if freqdata is None:

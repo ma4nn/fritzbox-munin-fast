@@ -41,19 +41,18 @@ class FritzboxInterface:
   __session = None
   __base_uri = ""
 
-  # default constructor
   def __init__(self, config: FritzboxConfig = None, session: FritzboxFileSession = None):
-    self.config = config if (config) else FritzboxConfig()
-    self.__session = session if (session) else FritzboxFileSession(self.config.server, self.config.user, self.config.port)
+    self.config = config if config else FritzboxConfig()
+    self.__session = session if session else FritzboxFileSession(self.config.server, self.config.user, self.config.port)
     self.__base_uri = self.__get_base_uri()
 
   def __get_base_uri(self) -> str:
     default_ports = (80, 443)
     schemes = ('http', 'https')
-    if self.config.port and self.config.port != default_ports[self.config.useTls]:
-      return f"{schemes[self.config.useTls]}://{self.config.server}:{self.config.port}"
+    if self.config.port and self.config.port != default_ports[self.config.use_tls]:
+      return f"{schemes[self.config.use_tls]}://{self.config.server}:{self.config.port}"
 
-    return f"{schemes[self.config.useTls]}://{self.config.server}"
+    return f"{schemes[self.config.use_tls]}://{self.config.server}"
 
   def get_page_with_login(self, page: str, data=None) -> str:
     if data is None:
@@ -70,7 +69,7 @@ class FritzboxInterface:
     except JSONDecodeError as json_exception:
       # Perhaps session expired, let's clear the session and try again
       self.__session.clear_session()
-      sys.exit('ERROR: Did not receive valid JSON data from FritzBox, so automatically cleared the session, please try again.: ' + str(json_exception))
+      sys.exit('ERROR: Did not receive valid JSON data from FritzBox, so automatically cleared the session, please try again: ' + str(json_exception) + "; data: " + data)
 
     return json_data
 
@@ -87,6 +86,7 @@ class FritzboxInterface:
     # Once with dynamic salt.
     hash1 = hashlib.pbkdf2_hmac("sha256", self.config.password.encode(), salt1, iter1)
     hash2 = hashlib.pbkdf2_hmac("sha256", hash1, salt2, iter2)
+
     return f"{challenge_parts[4]}${hash2.hex()}"
 
   # Code from https://avm.de/fileadmin/user_upload/Global/Service/Schnittstellen/AVM_Technical_Note_-_Session_ID_deutsch_2021-05-03.pdf
@@ -98,6 +98,7 @@ class FritzboxInterface:
     md5_sum = hashlib.md5()
     md5_sum.update(response)
     response = challenge + "-" + md5_sum.hexdigest()
+
     return response
 
   def __get_session_id(self) -> str:
@@ -112,7 +113,7 @@ class FritzboxInterface:
 
     url = f"{self.__base_uri}/login_sid.lua?version=2"
     try:
-      result = requests.get(url, headers=headers, verify=self.config.certificateFile)
+      result = requests.get(url, headers=headers, verify=self.config.certificate_file)
       result.raise_for_status()
     except (requests.exceptions.HTTPError, requests.exceptions.SSLError) as err:
       print(err)
@@ -137,7 +138,7 @@ class FritzboxInterface:
 
     url = f"{self.__base_uri}/login_sid.lua"
     try:
-      result = requests.get(url, headers=headers, params=params, verify=self.config.certificateFile)
+      result = requests.get(url, headers=headers, params=params, verify=self.config.certificate_file)
       result.raise_for_status()
     except (requests.exceptions.HTTPError, requests.exceptions.SSLError) as err:
       print(err)
@@ -170,6 +171,7 @@ class FritzboxInterface:
           sys.exit(1)
 
     session_id = self.__get_session_id()
+
     return method(session_id, page, data)
 
   def __post(self, session_id, page, data=None) -> str:
@@ -189,10 +191,10 @@ class FritzboxInterface:
 
     url = f"{self.__base_uri}/{page}"
 
-    result = requests.post(url, headers=headers, data=data, verify=self.config.certificateFile)
+    result = requests.post(url, headers=headers, data=data, verify=self.config.certificate_file)
     result.raise_for_status()
 
-    return str(result.content)
+    return result.text
 
   def __get(self, session_id, page, data=None) -> str:
     """Fetches a page from the Fritzbox and returns its content
@@ -211,7 +213,7 @@ class FritzboxInterface:
     params["sid"] = session_id
     url = f"{self.__base_uri}/{page}"
 
-    result = requests.get(url, headers=headers, params=params, verify=self.config.certificateFile)
+    result = requests.get(url, headers=headers, params=params, verify=self.config.certificate_file)
     result.raise_for_status()
 
-    return str(result.content)
+    return result.text

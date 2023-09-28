@@ -32,7 +32,7 @@ def retrieveSmartHomeTemps():
   config = FritzboxConfig()
 
   try:
-    connection = FritzConnection(address=config.server, user=config.user, password=config.password, use_tls=config.useTls)
+    connection = FritzConnection(address=config.server, user=config.user, password=config.password, use_tls=config.use_tls)
   except Exception as e:
     sys.exit("Couldn't get temperature: " + str(e))
 

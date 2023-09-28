@@ -76,7 +76,7 @@ class FritzboxTraffic:
 if __name__ == "__main__":
   config = FritzboxConfig()
   try:
-    traffic = FritzboxTraffic(FritzStatus(address=config.server, user=config.user, password=config.password, use_tls=config.useTls))
+    traffic = FritzboxTraffic(FritzStatus(address=config.server, user=config.user, password=config.password, use_tls=config.use_tls))
   except FritzConnectionException as connection_exception:
     sys.exit("Couldn't get traffic: " + str(connection_exception))
 

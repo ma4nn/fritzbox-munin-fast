@@ -45,7 +45,7 @@ class FritzboxConnectionUptime:
 if __name__ == "__main__":
   config = FritzboxConfig()
   try:
-    uptime = FritzboxConnectionUptime(FritzStatus(address=config.server, user=config.user, password=config.password, use_tls=config.useTls))
+    uptime = FritzboxConnectionUptime(FritzStatus(address=config.server, user=config.user, password=config.password, use_tls=config.use_tls))
   except FritzConnectionException as connection_exception:
     sys.exit("Couldn't get connection uptime: " + str(connection_exception))
 

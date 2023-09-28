@@ -9,10 +9,9 @@ class FritzboxConfig:
   user = ""
   """the password to log into the Fritzbox webinterface"""
   password = ""
-  useTls = True
-  certificateFile = str(os.getenv('MUNIN_CONFDIR')) + '/box.cer'
+  use_tls = True
+  certificate_file = str(os.getenv('MUNIN_CONFDIR')) + '/box.cer'
 
-  # default constructor
   def __init__(self):
     if os.getenv('fritzbox_ip'):
       self.server = str(os.getenv('fritzbox_ip'))
@@ -21,6 +20,6 @@ class FritzboxConfig:
     self.user = str(os.getenv('fritzbox_user'))
     self.password = str(os.getenv('fritzbox_password'))
     if os.getenv('fritzbox_certificate'):
-      self.certificateFile = str(os.getenv('fritzbox_certificate'))
+      self.certificate_file = str(os.getenv('fritzbox_certificate'))
     if os.getenv('fritzbox_use_tls'):
-      self.useTls = str(os.getenv('fritzbox_use_tls')) == 'true'
+      self.use_tls = str(os.getenv('fritzbox_use_tls')) == 'true'
