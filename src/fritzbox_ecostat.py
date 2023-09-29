@@ -23,25 +23,27 @@
 import os
 import sys
 from fritzbox_interface import FritzboxInterface
+from fritzbox_munin_plugin_interface import MuninPluginInterface
 
 PAGE = 'data.lua'
 PARAMS = {'xhr':1, 'lang':'de', 'page':'ecoStat', 'xhrId':'all', 'useajax':1, 'no_sidrenew':None}
 RAMLABELS = ['strict', 'cache', 'free']
 
-class FritzboxEcostat:
+def get_modes():
+  return os.getenv('ecostat_modes').split(' ') if (os.getenv('ecostat_modes')) else []
+
+
+class FritzboxEcostat(MuninPluginInterface):
   __connection = None
 
   def __init__(self, fritzbox_interface: FritzboxInterface):
     self.__connection = fritzbox_interface
 
-  def get_modes(self):
-    return os.getenv('ecostat_modes').split(' ') if (os.getenv('ecostat_modes')) else []
-
-  def print_simple_series(self, data, name, graph, low=None, high=None):
+  def __print_simple_series(self, data, name, graph, low=None, high=None):
     """print last value of first json data series"""
-    self.print_multi_series(data, [name], graph, low, high)
+    self.__print_multi_series(data, [name], graph, low, high)
 
-  def print_multi_series(self, data, names, graph, low=None, high=None):
+  def __print_multi_series(self, data, names, graph, low=None, high=None):
     """print last value of multiple json data series"""
 
     print("multigraph " + graph)
@@ -55,28 +57,28 @@ class FritzboxEcostat:
       else:
         print("# " + str(val) + " exceeded limits " + str(low) + " - " + str(high))
 
-  def print_system_stats(self):
+  def print_stats(self):
     """print the current system statistics"""
 
-    modes = self.get_modes()
+    modes = get_modes()
 
     # download the graphs
     jsondata = self.__connection.post_page_with_login(PAGE, data=PARAMS)['data']
 
     if 'cpu' in modes:
       cpuload_data = jsondata['cpuutil']
-      self.print_simple_series(cpuload_data, 'load', 'cpuload')
+      self.__print_simple_series(cpuload_data, 'load', 'cpuload')
 
     if 'temp' in modes:
       cputemp_data = jsondata['cputemp']
-      self.print_simple_series(cputemp_data, 'temp', 'cputemp', low=0, high=120)
+      self.__print_simple_series(cputemp_data, 'temp', 'cputemp', low=0, high=120)
 
     if 'ram' in modes:
       ramusage_data = jsondata['ramusage']
-      self.print_multi_series(ramusage_data, RAMLABELS, 'ramusage')
+      self.__print_multi_series(ramusage_data, RAMLABELS, 'ramusage')
 
   def print_config(self):
-    modes = self.get_modes()
+    modes = get_modes()
 
     if 'cpu' in modes:
       print("multigraph cpuload")
@@ -127,4 +129,4 @@ if __name__ == "__main__":
   elif len(sys.argv) == 2 and sys.argv[1] == 'autoconf':
     print("yes")  # Some docs say it'll be called with fetch, some say no arg at all
   elif len(sys.argv) == 1 or (len(sys.argv) == 2 and sys.argv[1] == 'fetch'):
-    ecostat.print_system_stats()
+    ecostat.print_stats()

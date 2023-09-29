@@ -24,6 +24,6 @@ class TestFritzboxConnectionUptime():
 
   def test_uptime(self, capsys):
     uptime = FritzboxConnectionUptime(get_fritzstatus_mock())
-    uptime.print_uptime()
+    uptime.print_stats()
 
     assert capsys.readouterr().out == "uptime.value 5.20\n"

@@ -36,6 +36,7 @@ from lxml import etree
 from fritzbox_config import FritzboxConfig
 from fritzbox_file_session import FritzboxFileSession
 
+
 class FritzboxInterface:
   config = None
   __session = None
@@ -64,7 +65,7 @@ class FritzboxInterface:
       json_data = json.loads(data)
     except JSONDecodeError as json_exception:
       # Perhaps session expired, let's clear the session and try again
-      self.__session.clear_session()
+      self.__session.clear()
       sys.exit('ERROR: Did not receive valid JSON data from FritzBox, so automatically cleared the session, please try again: ' + str(json_exception) + "; data: " + data)
 
     return json_data
@@ -143,14 +144,14 @@ class FritzboxInterface:
       print("ERROR: No SID received because of invalid credentials")
       sys.exit(0)
 
-    self.__session.save_session_id(session_id)
+    self.__session.save(session_id)
 
     return session_id
 
   def __call_page_with_login(self, method: Callable[[], str], page, data=None) -> str:
     if data is None:
       data = {}
-    session_id = self.__session.load_session_id()
+    session_id = self.__session.load()
 
     if session_id is not None:
       try:

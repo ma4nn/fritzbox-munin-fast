@@ -25,6 +25,7 @@ import os
 import re
 import sys
 from fritzbox_interface import FritzboxInterface
+from fritzbox_munin_plugin_interface import MuninPluginInterface
 
 PAGE = 'data.lua'
 PARAMS = {'xhr':1, 'lang':'de', 'page':'energy', 'xhrId':'all', 'useajax':1, 'no_sidrenew':None}
@@ -49,34 +50,34 @@ hourLoc = {"de": "Stunden", "en": "hours"}
 minutesLoc = {"de": "Minuten", "en": "minutes"}
 pattern = re.compile(patternLoc[locale])
 
-class FritzboxEnergy:
+def get_modes():
+  return os.getenv('energy_modes').split(' ') if (os.getenv('energy_modes')) else []
+
+def get_type():
+  return os.getenv('energy_product')
+
+class FritzboxEnergy(MuninPluginInterface):
   __connection = None
 
   def __init__(self, fritzbox_interface: FritzboxInterface):
     self.__connection = fritzbox_interface
 
-  def get_modes(self):
-    return os.getenv('energy_modes').split(' ') if (os.getenv('energy_modes')) else []
-
-  def get_type(self):
-    return os.getenv('energy_product')
-
-  def get_devices_for(self, type):
+  def __get_devices_for(self, type):
     if type == "DSL":
       return DEVICES
     if type == "repeater":
       return DEVICES_REPEATER
     raise Exception("No such type")
 
-  def print_energy_stats(self):
+  def print_stats(self):
     """print the current energy statistics"""
 
-    modes = self.get_modes()
-    type = self.get_type()
+    modes = get_modes()
+    type = get_type()
 
     # download the graphs
     jsondata = self.__connection.post_page_with_login(PAGE, data=PARAMS)['data']['drain']
-    devices = self.get_devices_for(type)
+    devices = self.__get_devices_for(type)
 
     if 'power' in modes:
       print("multigraph power")
@@ -119,9 +120,9 @@ class FritzboxEnergy:
         print("uptime.value %.2f" % uptime)
 
   def print_config(self):
-    modes = self.get_modes()
-    type = self.get_type()
-    devices = self.get_devices_for(type)
+    modes = get_modes()
+    type = get_type()
+    devices = self.__get_devices_for(type)
 
     if 'power' in modes:
       print("multigraph power")
@@ -169,6 +170,7 @@ class FritzboxEnergy:
       print("uptime.label uptime")
       print("uptime.draw AREA")
 
+
 if __name__ == "__main__":
   energy = FritzboxEnergy(FritzboxInterface())
 
@@ -177,4 +179,4 @@ if __name__ == "__main__":
   elif len(sys.argv) == 2 and sys.argv[1] == 'autoconf':
     print("yes")  # Some docs say it'll be called with fetch, some say no arg at all
   elif len(sys.argv) == 1 or (len(sys.argv) == 2 and sys.argv[1] == 'fetch'):
-    energy.print_energy_stats()
+    energy.print_stats()

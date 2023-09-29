@@ -8,6 +8,7 @@ import os
 def get_session_dir() -> str:
   return str(os.getenv('MUNIN_PLUGSTATE')) + '/fritzbox'
 
+
 class FritzboxFileSession:
   __separator = "__"
   __server = ""
@@ -25,7 +26,7 @@ class FritzboxFileSession:
   def __get_session_filename(self) -> str:
     return self.__server + self.__separator + str(self.__port) + self.__separator + self.__user + '.sid'
 
-  def save_session_id(self, session_id):
+  def save(self, session_id):
     statedir = get_session_dir()
 
     if not os.path.exists(statedir):
@@ -36,7 +37,7 @@ class FritzboxFileSession:
     with open(statefilename, 'w', encoding='utf8') as statefile:
       statefile.write(session_id)
 
-  def load_session_id(self) -> None | str:
+  def load(self) -> None | str:
     statefilename = get_session_dir() + '/' + self.__get_session_filename()
     if not os.path.exists(statefilename):
       return None
@@ -45,5 +46,5 @@ class FritzboxFileSession:
       session_id = statefile.readline()
       return session_id
 
-  def clear_session(self):
+  def clear(self):
     os.remove(get_session_dir() + '/' + self.__get_session_filename())

@@ -22,6 +22,8 @@
 import sys
 from fritzbox_interface import FritzboxInterface
 
+# @todo refactor
+
 PAGE = 'data.lua'
 PARAMS = {'xhr':1, 'lang':'de', 'page':'netMoni', 'xhrId':'updateGraphs', 'useajax':1, 'no_sidrenew':None}
 

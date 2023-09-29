@@ -108,7 +108,7 @@ uptime.draw AREA
 
   def test_print_energy_stats(self, fixture_version: str, capsys): # pylint: disable=unused-argument
     energy = FritzboxEnergy(FritzboxInterface())
-    energy.print_energy_stats()
+    energy.print_stats()
 
     assert capsys.readouterr().out == """multigraph power
 system.value 24

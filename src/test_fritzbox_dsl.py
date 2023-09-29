@@ -116,7 +116,7 @@ ses_send.warning 1
 
   def test_print_dsl_stats(self, fixture_version: str, capsys): # pylint: disable=unused-argument
     dsl = FritzboxDsl(FritzboxInterface())
-    dsl.print_dsl_stats()
+    dsl.print_stats()
 
     assert capsys.readouterr().out == """multigraph dsl_capacity
 recv.value 139083

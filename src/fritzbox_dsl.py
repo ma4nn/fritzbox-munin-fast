@@ -23,6 +23,7 @@
 import os
 import sys
 from fritzbox_interface import FritzboxInterface
+from fritzbox_munin_plugin_interface import MuninPluginInterface
 
 PAGE = 'data.lua'
 PARAMS = {'xhr':1, 'lang':'de', 'page':'dslStat', 'xhrId':'refresh', 'useajax':1, 'no_sidrenew':None}
@@ -64,13 +65,13 @@ def print_graph(name, recv, send, prefix=""):
   print(prefix + "recv.value " + recv)
   print(prefix + "send.value " + send)
 
-class FritzboxDsl:
+class FritzboxDsl(MuninPluginInterface):
   __connection = None
 
   def __init__(self, fritzbox_interface: FritzboxInterface):
     self.__connection = fritzbox_interface
 
-  def print_dsl_stats(self):
+  def print_stats(self):
     """print the current DSL statistics"""
 
     modes = get_modes()
@@ -173,6 +174,6 @@ if __name__ == "__main__":
     print("yes")  # Some docs say it'll be called with fetch, some say no arg at all
   elif len(sys.argv) == 1 or (len(sys.argv) == 2 and sys.argv[1] == 'fetch'):
     try:
-      dsl.print_dsl_stats()
+      dsl.print_stats()
     except Exception as e:
       sys.exit("Couldn't retrieve fritzbox dsl stats: " + str(e))

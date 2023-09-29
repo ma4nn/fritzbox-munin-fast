@@ -51,7 +51,7 @@ maxup.info Maximum speed of the WAN interface.
 
   def test_traffic(self, capsys):
     traffic = FritzboxTraffic(get_fritzstatus_mock())
-    traffic.print_traffic()
+    traffic.print_stats()
 
     assert capsys.readouterr().out == """down.value 4373
 up.value 1024

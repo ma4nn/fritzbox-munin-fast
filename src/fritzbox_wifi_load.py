@@ -25,6 +25,8 @@ import os
 import sys
 from fritzbox_interface import FritzboxInterface
 
+# @todo refactor
+
 PAGE = 'data.lua'
 PARAMS = {'xhr':1, 'lang':'de', 'page':'chan', 'xhrId':'environment', 'useajax':1, 'no_sidrenew':None}
 

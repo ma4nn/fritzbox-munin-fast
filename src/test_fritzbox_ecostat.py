@@ -73,7 +73,7 @@ free.draw AREASTACK
 
   def test_print_system_stats(self, fixture_version: str, capsys): # pylint: disable=unused-argument
     ecostat = FritzboxEcostat(FritzboxInterface())
-    ecostat.print_system_stats()
+    ecostat.print_stats()
 
     assert capsys.readouterr().out == """multigraph cpuload
 load.value 10

@@ -24,14 +24,16 @@ import sys
 from fritzconnection.lib.fritzstatus import FritzStatus
 from fritzconnection.core.exceptions import FritzConnectionException
 from fritzbox_config import FritzboxConfig
+from fritzbox_munin_plugin_interface import MuninPluginInterface
 
-class FritzboxTraffic:
+
+class FritzboxTraffic(MuninPluginInterface):
   __connection = None
 
   def __init__(self, fritzstatus_connection: FritzStatus):
     self.__connection = fritzstatus_connection
 
-  def print_traffic(self):
+  def print_stats(self):
     transmission_rate = self.__connection.transmission_rate
     print(f"down.value {transmission_rate[1]}")
     print(f"up.value {transmission_rate[0]}")
@@ -73,6 +75,7 @@ class FritzboxTraffic:
       print("maxup.draw LINE1")
       print("maxup.info Maximum speed of the WAN interface.")
 
+
 if __name__ == "__main__":
   config = FritzboxConfig()
   try:
@@ -85,4 +88,4 @@ if __name__ == "__main__":
   elif len(sys.argv) == 2 and sys.argv[1] == 'autoconf':
     print("yes")  # Some docs say it'll be called with fetch, some say no arg at all
   elif len(sys.argv) == 1 or (len(sys.argv) == 2 and sys.argv[1] == 'fetch'):
-    traffic.print_traffic()
+    traffic.print_stats()
