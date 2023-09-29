@@ -20,6 +20,7 @@ The main differences to the original version are:
 - Support for Smart Home devices, e.g. for measuring temperature
 - Complete refactoring of the Python code base to make it more robust, use modern language features like type hinting and reuse identical code
 - Add possibility to connect to FRITZ!Box via TLS
+- Added automated testing via Github Actions
 
 ## Requirements
 - FRITZ!Box router with FRITZ!OS >= 07.50 (if you are on an older FRITZ!OS version, select an older version of fritzbox-munin-fast by browsing the tags in this repository)

@@ -3,20 +3,19 @@
   Unit tests for dsl module
 """
 
-from unittest.mock import Mock,patch
+from unittest.mock import Mock
 import os
 import unittest
 import pytest
 from fritzbox_dsl import FritzboxDsl
 from fritzbox_interface import FritzboxInterface
-from test_base import BaseTestCase
 
 
 @unittest.mock.patch.dict(os.environ, {
   "dsl_modes": "capacity snr damping errors crc INVALID"
 })
-@pytest.mark.parametrize("fixture_version", ["7590-7.57"])
-class TestFritzboxDsl(BaseTestCase):
+@pytest.mark.parametrize("fixture_version", ["7590-7.57"], indirect=True)
+class TestFritzboxDsl():
 
   @unittest.mock.patch.dict(os.environ, {
     "dsl_modes": "INVALID"

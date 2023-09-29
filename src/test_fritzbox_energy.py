@@ -9,15 +9,14 @@ import unittest
 import pytest
 from fritzbox_energy import FritzboxEnergy
 from fritzbox_interface import FritzboxInterface
-from test_base import BaseTestCase
 
 
 @unittest.mock.patch.dict(os.environ, {
   "energy_modes": "power devices uptime INVALID",
   "energy_product": "DSL"
 })
-@pytest.mark.parametrize("fixture_version", ["7590-7.28"])
-class TestFritzboxEnergy(BaseTestCase):
+@pytest.mark.parametrize("fixture_version", ["7590-7.28"], indirect=True)
+class TestFritzboxEnergy():
 
   @unittest.mock.patch.dict(os.environ, {
     "energy_modes": "INVALID",

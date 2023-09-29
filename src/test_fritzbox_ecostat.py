@@ -9,14 +9,13 @@ import unittest
 import pytest
 from fritzbox_ecostat import FritzboxEcostat
 from fritzbox_interface import FritzboxInterface
-from test_base import BaseTestCase
 
 
 @unittest.mock.patch.dict(os.environ, {
   "ecostat_modes": "cpu temp ram INVALID"
 })
-@pytest.mark.parametrize("fixture_version", ["7590-7.28"])
-class TestFritzboxEcostat(BaseTestCase):
+@pytest.mark.parametrize("fixture_version", ["7590-7.28"], indirect=True)
+class TestFritzboxEcostat():
 
   @unittest.mock.patch.dict(os.environ, {
     "ecostat_modes": "INVALID"

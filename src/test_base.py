@@ -1,15 +1,7 @@
 import os
-import pytest
-from unittest.mock import MagicMock,patch
+from unittest.mock import MagicMock
 
-
-class BaseTestCase: # pylint: disable=too-few-public-methods
-  @pytest.fixture(autouse=True)
-  def setup_and_teardown(self, fixture_version: str):
-    with patch('requests.request', side_effect=RequestMock) as mock_requests:
-      mock_requests.side_effect.version = fixture_version
-      yield
-
+# @todo rename to test_request_mock.py
 
 class RequestMock: # pylint: disable=too-few-public-methods
   version: str
