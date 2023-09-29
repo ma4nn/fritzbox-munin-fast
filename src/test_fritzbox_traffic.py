@@ -3,11 +3,11 @@
   Unit tests for traffic module
 """
 
-from unittest.mock import Mock
+from unittest.mock import MagicMock
 from fritzbox_traffic import FritzboxTraffic
 
-def get_fritzstatus_mock() -> Mock:
-  mock_fritzstatus = Mock()
+def get_fritzstatus_mock() -> MagicMock:
+  mock_fritzstatus = MagicMock()
   mock_fritzstatus.max_bit_rate = [182, 1]
   mock_fritzstatus.transmission_rate = [1024, 4373]
 

@@ -3,14 +3,15 @@
   Unit tests for connection uptime module
 """
 
-from unittest.mock import Mock
+from unittest.mock import MagicMock
 from fritzbox_connection_uptime import FritzboxConnectionUptime
 
-def get_fritzstatus_mock() -> Mock:
-  mock_fritzstatus = Mock()
+def get_fritzstatus_mock() -> MagicMock:
+  mock_fritzstatus = MagicMock()
   mock_fritzstatus.external_ip = '127.0.0.1'
   mock_fritzstatus.external_ipv6 = '0000::0000::0000::0000'
-  mock_fritzstatus.uptime = 18720
+  mock_fritzstatus.connection_uptime = 18720
+  mock_fritzstatus.uptime = mock_fritzstatus.connection_uptime
 
   return mock_fritzstatus
 
