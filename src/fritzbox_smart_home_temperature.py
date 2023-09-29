@@ -8,7 +8,7 @@
 import sys
 from fritzconnection import FritzConnection
 from fritzbox_config import FritzboxConfig
-from fritzbox_munin_plugin_interface import MuninPluginInterface
+from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler
 
 
 class FritzboxSmartHomeTemperature(MuninPluginInterface):
@@ -16,7 +16,7 @@ class FritzboxSmartHomeTemperature(MuninPluginInterface):
     """get the current cpu temperature"""
 
     for data in self.__retrieve_smart_home_temps():
-      print ("t{}.value {}".format(data['NewDeviceId'],float(data['NewTemperatureCelsius']) / 10))
+      print (f"t{data['NewDeviceId']}.value {float(data['NewTemperatureCelsius']) / 10}")
 
   def print_config(self):
     print("graph_title Smart Home temperature")
@@ -25,10 +25,10 @@ class FritzboxSmartHomeTemperature(MuninPluginInterface):
     print("graph_scale no")
 
     for data in self.__retrieve_smart_home_temps():
-      print ("t{}.label {}".format(data['NewDeviceId'],data['NewDeviceName']))
-      print ("t{}.type GAUGE".format(data['NewDeviceId']))
-      print ("t{}.graph LINE".format(data['NewDeviceId']))
-      print ("t{}.info Temperature [{}]".format(data['NewDeviceId'],data['NewProductName']))
+      print (f"t{data['NewDeviceId']}.label {data['NewDeviceName']}")
+      print (f"t{data['NewDeviceId']}.type GAUGE")
+      print (f"t{data['NewDeviceId']}.graph LINE")
+      print (f"t{data['NewDeviceId']}.info Temperature [{data['NewProductName']}]")
 
   def __retrieve_smart_home_temps(self):
     smart_home_data = []
@@ -52,15 +52,4 @@ class FritzboxSmartHomeTemperature(MuninPluginInterface):
 
 
 if __name__ == '__main__':
-  home = FritzboxSmartHomeTemperature()
-
-  if len(sys.argv) == 2 and sys.argv[1] == 'config':
-    home.print_config()
-  elif len(sys.argv) == 2 and sys.argv[1] == 'autoconf':
-    print('yes')
-  elif len(sys.argv) == 1 or len(sys.argv) == 2 and sys.argv[1] == 'fetch':
-    # Some docs say it'll be called with fetch, some say no arg at all
-    try:
-      home.print_stats()
-    except Exception as e:
-      sys.exit("Couldn't retrieve fritzbox smarthome temperatures: " + str(e))
+  main_handler(FritzboxSmartHomeTemperature())

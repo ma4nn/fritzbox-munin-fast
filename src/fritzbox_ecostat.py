@@ -21,9 +21,8 @@
 """
 
 import os
-import sys
 from fritzbox_interface import FritzboxInterface
-from fritzbox_munin_plugin_interface import MuninPluginInterface
+from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler
 
 PAGE = 'data.lua'
 PARAMS = {'xhr':1, 'lang':'de', 'page':'ecoStat', 'xhrId':'all', 'useajax':1, 'no_sidrenew':None}
@@ -122,11 +121,4 @@ class FritzboxEcostat(MuninPluginInterface):
 
 
 if __name__ == "__main__":
-  ecostat = FritzboxEcostat(FritzboxInterface())
-
-  if len(sys.argv) == 2 and sys.argv[1] == 'config':
-    ecostat.print_config()
-  elif len(sys.argv) == 2 and sys.argv[1] == 'autoconf':
-    print("yes")  # Some docs say it'll be called with fetch, some say no arg at all
-  elif len(sys.argv) == 1 or (len(sys.argv) == 2 and sys.argv[1] == 'fetch'):
-    ecostat.print_stats()
+  main_handler(FritzboxEcostat(FritzboxInterface()))

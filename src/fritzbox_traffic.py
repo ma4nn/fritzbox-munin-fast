@@ -20,11 +20,9 @@
 """
 
 import os
-import sys
 from fritzconnection.lib.fritzstatus import FritzStatus
-from fritzconnection.core.exceptions import FritzConnectionException
 from fritzbox_config import FritzboxConfig
-from fritzbox_munin_plugin_interface import MuninPluginInterface
+from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler
 
 
 class FritzboxTraffic(MuninPluginInterface):
@@ -78,14 +76,5 @@ class FritzboxTraffic(MuninPluginInterface):
 
 if __name__ == "__main__":
   config = FritzboxConfig()
-  try:
-    traffic = FritzboxTraffic(FritzStatus(address=config.server, user=config.user, password=config.password, use_tls=config.use_tls))
-  except FritzConnectionException as connection_exception:
-    sys.exit("Couldn't get traffic: " + str(connection_exception))
-
-  if len(sys.argv) == 2 and sys.argv[1] == 'config':
-    traffic.print_config()
-  elif len(sys.argv) == 2 and sys.argv[1] == 'autoconf':
-    print("yes")  # Some docs say it'll be called with fetch, some say no arg at all
-  elif len(sys.argv) == 1 or (len(sys.argv) == 2 and sys.argv[1] == 'fetch'):
-    traffic.print_stats()
+  traffic = FritzboxTraffic(FritzStatus(address=config.server, user=config.user, password=config.password, use_tls=config.use_tls))
+  main_handler(traffic)

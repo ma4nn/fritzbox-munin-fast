@@ -18,11 +18,9 @@
   #%# capabilities=autoconf
 """
 
-import sys
 from fritzconnection.lib.fritzstatus import FritzStatus
-from fritzconnection.core.exceptions import FritzConnectionException
 from fritzbox_config import FritzboxConfig
-from fritzbox_munin_plugin_interface import MuninPluginInterface
+from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler
 
 
 class FritzboxConnectionUptime(MuninPluginInterface):
@@ -47,14 +45,6 @@ class FritzboxConnectionUptime(MuninPluginInterface):
 
 if __name__ == "__main__":
   config = FritzboxConfig()
-  try:
-    uptime = FritzboxConnectionUptime(FritzStatus(address=config.server, user=config.user, password=config.password, use_tls=config.use_tls))
-  except FritzConnectionException as connection_exception:
-    sys.exit("Couldn't get connection uptime: " + str(connection_exception))
+  uptime = FritzboxConnectionUptime(FritzStatus(address=config.server, user=config.user, password=config.password, use_tls=config.use_tls))
 
-  if len(sys.argv) == 2 and sys.argv[1] == 'config':
-    uptime.print_config()
-  elif len(sys.argv) == 2 and sys.argv[1] == 'autoconf':
-    print("yes")  # Some docs say it'll be called with fetch, some say no arg at all
-  elif len(sys.argv) == 1 or (len(sys.argv) == 2 and sys.argv[1] == 'fetch'):
-    uptime.print_stats()
+  main_handler(uptime)

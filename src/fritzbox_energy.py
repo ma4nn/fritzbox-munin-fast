@@ -25,7 +25,7 @@ import os
 import re
 import sys
 from fritzbox_interface import FritzboxInterface
-from fritzbox_munin_plugin_interface import MuninPluginInterface
+from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler
 
 PAGE = 'data.lua'
 PARAMS = {'xhr':1, 'lang':'de', 'page':'energy', 'xhrId':'all', 'useajax':1, 'no_sidrenew':None}
@@ -172,11 +172,4 @@ class FritzboxEnergy(MuninPluginInterface):
 
 
 if __name__ == "__main__":
-  energy = FritzboxEnergy(FritzboxInterface())
-
-  if len(sys.argv) == 2 and sys.argv[1] == 'config':
-    energy.print_config()
-  elif len(sys.argv) == 2 and sys.argv[1] == 'autoconf':
-    print("yes")  # Some docs say it'll be called with fetch, some say no arg at all
-  elif len(sys.argv) == 1 or (len(sys.argv) == 2 and sys.argv[1] == 'fetch'):
-    energy.print_stats()
+  main_handler(FritzboxEnergy(FritzboxInterface()))
