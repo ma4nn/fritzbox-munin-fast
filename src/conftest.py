@@ -1,6 +1,6 @@
-import pytest
 from unittest.mock import patch
-from test_base import RequestMock
+import pytest
+from test_request_mock import RequestMock
 
 
 @pytest.fixture(autouse=True)

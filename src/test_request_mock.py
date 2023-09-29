@@ -1,8 +1,6 @@
 import os
 from unittest.mock import MagicMock
 
-# @todo rename to test_request_mock.py
-
 class RequestMock: # pylint: disable=too-few-public-methods
   version: str
 
