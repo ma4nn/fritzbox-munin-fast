@@ -78,13 +78,13 @@ Multigraph plugin, showing for 2.4GHz and 5GHz
 
 ## Installation & Configuration
 
-1. Pre-requisites for the `fritzbox_traffic` and `fritzbox_connection_uptime` plugins are the [fritzconnection](https://pypi.python.org/pypi/fritzconnection) and [requests](https://pypi.python.org/pypi/requests) package. To install run
+1. To install requirements run
 
         pip install -r requirements.txt
 
 1. Make sure the FRITZ!Box has UPnP status information enabled. (web interface: _Home Network > Network > Network Settings > Universal Plug & Play (UPnP)_)
 
-1. Copy all the scripts from `src/` folder to `/usr/share/munin/plugins`
+1. Copy all the scripts from the [published release](https://github.com/ma4nn/fritzbox-munin-fast/releases) to `/usr/share/munin/plugins`
 
 1. (optional) If you want to connect to FRITZ!Box using SSL, download the Fritz certificate (web interface: _Internet > Freigaben > FritzBox Dienste > Zertifikat > Zertifikat herunterladen_) and save it to `/etc/munin/box.cer`.
 
@@ -98,9 +98,9 @@ Multigraph plugin, showing for 2.4GHz and 5GHz
    
    See the plugin files for plugin-specific configuration options.
 
-1. For each plugin you want to activate, create a symbolic link to `/etc/munin/plugins`, e.g.:
+1. For each plugin you want to activate, create a symbolic link to `/etc/munin/plugins` and make it executable, e.g.:
    ```
-   ln -s fritzbox_dsl.py /etc/munin/plugins/fritzbox_dsl.py
+   ln -s fritzbox_dsl.py /etc/munin/plugins/fritzbox_dsl.py && chmod +x /etc/munin/plugins/fritzbox_dsl.py
    ```
 
 1. Restart the munin-node daemon: `service munin-node restart`.
@@ -138,14 +138,16 @@ You can split the graphs of your FRITZ!Box from the localhost graphs by followin
 
 ## Testing
 
-To test a plugin use
+### Manual Testing
+
+To manually test a plugin use
 ```
 munin-run --debug fritzbox_connection_uptime.py
 ```
 
-## Unit Tests
+### Unit Tests
 
 Run all unit tests with
 ```
-pytest
+pytest --cov
 ```

@@ -21,4 +21,4 @@ def main_handler(plugin: MuninPluginInterface):
     try:
       plugin.print_stats()
     except Exception as e:
-      sys.exit(f"Couldn't retrieve fritzbox stats of {os.path.basename(sys.argv[0])}/{type(plugin).__name__}: {str(e)}")
+      sys.exit(f"Couldn't retrieve Fritzbox stats of {os.path.basename(sys.argv[0])}/{type(plugin).__name__}: {str(e)}")

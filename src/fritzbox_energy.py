@@ -23,7 +23,6 @@
 
 import os
 import re
-import sys
 from fritzbox_interface import FritzboxInterface
 from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler
 
@@ -43,8 +42,7 @@ INFO = {
 
 # date-from-text extractor foo
 locale = os.getenv('locale', 'de')
-patternLoc = {"de": "(\d+)\s(Tag|Stunden|Minuten)",
-              "en": "(\d+)\s(days|hours|minutes)"}
+patternLoc = {"de": r"(\d+)\s(Tag|Stunden|Minuten)", "en": r"(\d+)\s(days|hours|minutes)"}
 dayLoc = {"de": "Tag", "en": "days"}
 hourLoc = {"de": "Stunden", "en": "hours"}
 minutesLoc = {"de": "Minuten", "en": "minutes"}
@@ -56,28 +54,29 @@ def get_modes():
 def get_type():
   return os.getenv('energy_product')
 
+
 class FritzboxEnergy(MuninPluginInterface):
   __connection = None
 
   def __init__(self, fritzbox_interface: FritzboxInterface):
     self.__connection = fritzbox_interface
 
-  def __get_devices_for(self, type):
-    if type == "DSL":
+  def __get_devices_for(self, device_type):
+    if device_type == "DSL":
       return DEVICES
-    if type == "repeater":
+    if device_type == "repeater":
       return DEVICES_REPEATER
+
     raise Exception("No such type")
 
   def print_stats(self):
     """print the current energy statistics"""
 
     modes = get_modes()
-    type = get_type()
 
     # download the graphs
     jsondata = self.__connection.post_page_with_login(PAGE, data=PARAMS)['data']['drain']
-    devices = self.__get_devices_for(type)
+    devices = self.__get_devices_for(get_type())
 
     if 'power' in modes:
       print("multigraph power")
@@ -121,8 +120,7 @@ class FritzboxEnergy(MuninPluginInterface):
 
   def print_config(self):
     modes = get_modes()
-    type = get_type()
-    devices = self.__get_devices_for(type)
+    devices = self.__get_devices_for(get_type())
 
     if 'power' in modes:
       print("multigraph power")
