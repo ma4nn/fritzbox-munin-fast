@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ "3.9", "3.10", "3.11" ]
+        python-version: [ "3.10", "3.11" ]
 
     steps:
     - uses: actions/checkout@v4
@@ -26,7 +26,7 @@ jobs:
         pylint --fail-under 8 $(find . -name "*.py" | xargs)
     - name: Running tests
       run: |
-        pytest
+        pytest --cov
     - name: Archive production artifacts
       uses: actions/upload-artifact@v3
       with:
