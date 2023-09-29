@@ -8,38 +8,41 @@ import os
 import unittest
 import pytest
 from fritzbox_energy import FritzboxEnergy
+from fritzbox_interface import FritzboxInterface
 from test_base import BaseTestCase
 
+
+@unittest.mock.patch.dict(os.environ, {
+  "energy_modes": "power devices uptime INVALID",
+  "energy_product": "DSL"
+})
 @pytest.mark.parametrize("fixture_version", ["7590-7.28"])
 class TestFritzboxEnergy(BaseTestCase):
+
   @unittest.mock.patch.dict(os.environ, {
     "energy_modes": "INVALID",
     "energy_product": "DSL"
   })
-  def test_config_with_invalid_modes_only(self, fixture_version: str):
-    ecostat = FritzboxEnergy(self._create_interface_mock(fixture_version))
+  def test_config_with_invalid_modes_only(self, fixture_version: str, capsys): # pylint: disable=unused-argument
+    ecostat = FritzboxEnergy(FritzboxInterface())
+    ecostat.print_config()
 
-    # pylint: disable=no-value-for-parameter
-    self.assert_stdout("", ecostat.print_config)
+    assert capsys.readouterr().out == ""
 
   @unittest.mock.patch.dict(os.environ, {
     "energy_modes": "INVALID",
     "energy_product": "INVALID"
   })
-  def test_config_with_invalid_type(self, fixture_version: str):
-    energy = FritzboxEnergy(self._create_interface_mock(fixture_version))
+  def test_config_with_invalid_type(self, fixture_version: str): # pylint: disable=unused-argument
+    energy = FritzboxEnergy(FritzboxInterface())
 
     pytest.raises(Exception, energy.print_config)
 
-  @unittest.mock.patch.dict(os.environ, {
-    "energy_modes": "power devices uptime INVALID",
-    "energy_product": "DSL"
-  })
-  def test_config(self, fixture_version: str):
-    energy = FritzboxEnergy(self._create_interface_mock(fixture_version))
+  def test_config(self, fixture_version: str, capsys): # pylint: disable=unused-argument
+    energy = FritzboxEnergy(FritzboxInterface())
+    energy.print_config()
 
-    # pylint: disable=no-value-for-parameter
-    self.assert_stdout("""multigraph power
+    assert capsys.readouterr().out == """multigraph power
 graph_title Power Consumption
 graph_vlabel %
 graph_args --lower-limit 0 --upper-limit 100 --rigid
@@ -101,17 +104,14 @@ graph_args --base 1000 -l 0
 graph_scale no
 graph_category system
 uptime.label uptime
-uptime.draw AREA""", energy.print_config)
+uptime.draw AREA
+"""
 
-  @unittest.mock.patch.dict(os.environ, {
-    "energy_modes": "power devices uptime INVALID",
-    "energy_product": "DSL"
-  })
-  def test_print_energy_stats(self, fixture_version: str):
-    energy = FritzboxEnergy(self._create_interface_mock(fixture_version))
+  def test_print_energy_stats(self, fixture_version: str, capsys): # pylint: disable=unused-argument
+    energy = FritzboxEnergy(FritzboxInterface())
+    energy.print_energy_stats()
 
-    # pylint: disable=no-value-for-parameter
-    self.assert_stdout("""multigraph power
+    assert capsys.readouterr().out == """multigraph power
 system.value 24
 cpu.value 67
 wifi.value 57
@@ -122,4 +122,5 @@ multigraph devices
 wifi.value 55
 lan.value 40
 multigraph uptime
-uptime.value 66.25""", energy.print_energy_stats)
+uptime.value 66.25
+"""

@@ -31,8 +31,8 @@ RAMLABELS = ['strict', 'cache', 'free']
 class FritzboxEcostat:
   __connection = None
 
-  def __init__(self, fritzboxInterface: FritzboxInterface = None):
-    self.__connection = fritzboxInterface if (fritzboxInterface) else FritzboxInterface()
+  def __init__(self, fritzbox_interface: FritzboxInterface):
+    self.__connection = fritzbox_interface
 
   def get_modes(self):
     return os.getenv('ecostat_modes').split(' ') if (os.getenv('ecostat_modes')) else []
@@ -118,8 +118,9 @@ class FritzboxEcostat:
         print(l + ".type GAUGE")
         print(l + ".draw AREASTACK")
 
+
 if __name__ == "__main__":
-  ecostat = FritzboxEcostat()
+  ecostat = FritzboxEcostat(FritzboxInterface())
 
   if len(sys.argv) == 2 and sys.argv[1] == 'config':
     ecostat.print_config()

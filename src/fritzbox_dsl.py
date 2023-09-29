@@ -67,8 +67,8 @@ def print_graph(name, recv, send, prefix=""):
 class FritzboxDsl:
   __connection = None
 
-  def __init__(self, fritzbox_interface: FritzboxInterface = None):
-    self.__connection = fritzbox_interface if (fritzbox_interface) else FritzboxInterface()
+  def __init__(self, fritzbox_interface: FritzboxInterface):
+    self.__connection = fritzbox_interface
 
   def print_dsl_stats(self):
     """print the current DSL statistics"""
@@ -101,22 +101,9 @@ class FritzboxDsl:
       print_graph("dsl_ecc", jsondata['errorCounters'][9]['val'][0]['ds'], jsondata['errorCounters'][9]['val'][0]['us'], prefix="corr_")
       print_graph(None, jsondata['errorCounters'][13]['val'][0]['ds'], jsondata['errorCounters'][13]['val'][0]['us'], prefix="fail_")
 
-  def retrieve_max_values(self):
-    max_values = {'send': 0, 'recv': 0}
-    jsondata = self.__connection.post_page_with_login(PAGE, data=PARAMS)['data']
-
-    if not 'negotiatedValues' in jsondata:
-      return max_values
-
-    # retrieve values from "Leitungskapazitaet"
-    max_values['send'] = int(float(jsondata['negotiatedValues'][2]['val'][0]['us']))
-    max_values['recv'] = int(float(jsondata['negotiatedValues'][2]['val'][0]['ds']))
-
-    return max_values
-
   def print_config(self):
     modes = get_modes()
-    max_values = self.retrieve_max_values()
+    max_values = self.__retrieve_max_values()
 
     for mode in ['capacity', 'rate', 'snr', 'damping', 'crc']:
       if not mode in modes:
@@ -163,9 +150,22 @@ class FritzboxDsl:
         print(p + ".min 0")
         print(p + ".warning 1")
 
+  def __retrieve_max_values(self):
+    max_values = {'send': 0, 'recv': 0}
+    jsondata = self.__connection.post_page_with_login(PAGE, data=PARAMS)['data']
+
+    if not 'negotiatedValues' in jsondata:
+      return max_values
+
+    # retrieve values from "Leitungskapazitaet"
+    max_values['send'] = int(float(jsondata['negotiatedValues'][2]['val'][0]['us']))
+    max_values['recv'] = int(float(jsondata['negotiatedValues'][2]['val'][0]['ds']))
+
+    return max_values
+
 
 if __name__ == "__main__":
-  dsl = FritzboxDsl()
+  dsl = FritzboxDsl(FritzboxInterface())
 
   if len(sys.argv) == 2 and sys.argv[1] == 'config':
     dsl.print_config()

@@ -52,8 +52,8 @@ pattern = re.compile(patternLoc[locale])
 class FritzboxEnergy:
   __connection = None
 
-  def __init__(self, fritzboxInterface: FritzboxInterface = None):
-    self.__connection = fritzboxInterface if (fritzboxInterface) else FritzboxInterface()
+  def __init__(self, fritzbox_interface: FritzboxInterface):
+    self.__connection = fritzbox_interface
 
   def get_modes(self):
     return os.getenv('energy_modes').split(' ') if (os.getenv('energy_modes')) else []
@@ -170,7 +170,7 @@ class FritzboxEnergy:
       print("uptime.draw AREA")
 
 if __name__ == "__main__":
-  energy = FritzboxEnergy()
+  energy = FritzboxEnergy(FritzboxInterface())
 
   if len(sys.argv) == 2 and sys.argv[1] == 'config':
     energy.print_config()

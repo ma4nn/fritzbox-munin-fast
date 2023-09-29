@@ -6,7 +6,7 @@
 import os
 
 def get_session_dir() -> str:
-  return os.getenv('MUNIN_PLUGSTATE') + '/fritzbox'
+  return str(os.getenv('MUNIN_PLUGSTATE')) + '/fritzbox'
 
 class FritzboxFileSession:
   __separator = "__"
@@ -14,7 +14,6 @@ class FritzboxFileSession:
   __user = ""
   __port = None
 
-  # default constructor
   def __init__(self, server: str, user: str, port: int):
     if self.__separator in server or self.__separator in user:
       raise Exception("Reserved string \"" + self.__separator + "__\" in server or user name")
@@ -37,7 +36,7 @@ class FritzboxFileSession:
     with open(statefilename, 'w', encoding='utf8') as statefile:
       statefile.write(session_id)
 
-  def load_session_id(self) -> str:
+  def load_session_id(self) -> None | str:
     statefilename = get_session_dir() + '/' + self.__get_session_filename()
     if not os.path.exists(statefilename):
       return None

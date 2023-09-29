@@ -1,52 +1,46 @@
-import io
-import json
 import os
-import unittest
-from unittest.mock import Mock
-from typing import Callable
+import pytest
+from unittest.mock import MagicMock,patch
 
+class BaseTestCase:
+  @pytest.fixture(autouse=True)
+  def setup_and_teardown(self, fixture_version: str):
+    with patch('requests.request', side_effect=RequestMock) as mock_requests:
+      mock_requests.side_effect.version = fixture_version
+      yield
 
-# pylint: disable=too-few-public-methods
-class BaseTestCase():
+class RequestMock:
   version: str
 
-  @unittest.mock.patch('sys.stdout', new_callable=io.StringIO)
-  def assert_stdout(self, expected_output, method: Callable[[], str], mock_stdout):
-    method()
-    output = mock_stdout.getvalue()
-    assert expected_output == output.rstrip("\n")
-
-  def __side_effect_func_page_with_login(self, page: str, data) -> dict | str:
+  def __new__(self, *args, **kwargs):
     file_dir = f"{os.path.dirname(__file__)}/fixtures/fritzbox{self.version}"
 
-    if page == 'internet/dsl_stats_tab.lua':
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.text = ''
+
+    if 'internet/dsl_stats_tab.lua' in args[1]:
       with open(file_dir + "/dsl_stats_tab_lua.html", "r", encoding="utf-8") as file:
-        return file.read()
+        mock_response.text = file.read()
+
+    if 'login_sid.lua?version=2' in args[1]:
+      with open(file_dir + "/login_sid_lua.xml", "rb") as file:
+        mock_response.content = file.read()
 
     file_name = None
-    if page == 'internet/inetstat_monitor.lua':
+    if 'internet/inetstat_monitor.lua' in args[1]:
       file_name = "inetstat_monitor_lua.json"
-    elif page == 'data.lua' and data['page'] == 'ecoStat':
+    elif 'data.lua' in args[1] and kwargs['data']['page'] == 'ecoStat':
       file_name = "ecostat_data_lua.json"
-    elif page == 'data.lua' and data['page'] == 'energy':
+    elif 'data.lua' in args[1] and kwargs['data']['page'] == 'energy':
       file_name = "energy_data_lua.json"
-    elif page == 'data.lua' and data['page'] == 'dslStat':
+    elif 'data.lua' in args[1] and kwargs['data']['page'] == 'dslStat':
       file_name = "dsl_data_lua.json"
+    elif 'data.lua' in args[1]:
+      mock_response.text = "{'data': {}}"
 
     if file_name is not None:
       with open(file_dir + "/" + file_name, "r", encoding="utf-8") as file:
-        return json.load(file)
+        mock_response.text = file.read()
 
-    if page == 'data.lua':
-      return {"data": {}}
-
-    return ''
-
-  def _create_interface_mock(self, fixture_version="7590-7.57") -> Mock:
-    self.version = fixture_version
-
-    mock_interface = Mock()
-    mock_interface.get_page_with_login = Mock(side_effect=self.__side_effect_func_page_with_login)
-    mock_interface.post_page_with_login = Mock(side_effect=self.__side_effect_func_page_with_login)
-
-    return mock_interface
+    return mock_response

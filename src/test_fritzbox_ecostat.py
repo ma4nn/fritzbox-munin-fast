@@ -8,27 +8,30 @@ import os
 import unittest
 import pytest
 from fritzbox_ecostat import FritzboxEcostat
+from fritzbox_interface import FritzboxInterface
 from test_base import BaseTestCase
 
+
+@unittest.mock.patch.dict(os.environ, {
+  "ecostat_modes": "cpu temp ram INVALID"
+})
 @pytest.mark.parametrize("fixture_version", ["7590-7.28"])
 class TestFritzboxEcostat(BaseTestCase):
+
   @unittest.mock.patch.dict(os.environ, {
     "ecostat_modes": "INVALID"
   })
-  def test_config_with_invalid_modes_only(self, fixture_version: str):
-    ecostat = FritzboxEcostat(self._create_interface_mock(fixture_version))
+  def test_config_with_invalid_modes_only(self, fixture_version: str, capsys): # pylint: disable=unused-argument
+    ecostat = FritzboxEcostat(FritzboxInterface())
+    ecostat.print_config()
 
-    # pylint: disable=no-value-for-parameter
-    self.assert_stdout("", ecostat.print_config)
+    assert capsys.readouterr().out == ""
 
-  @unittest.mock.patch.dict(os.environ, {
-    "ecostat_modes": "cpu temp ram INVALID"
-  })
-  def test_config(self, fixture_version: str):
-    dsl = FritzboxEcostat(self._create_interface_mock(fixture_version))
+  def test_config(self, fixture_version: str, capsys): # pylint: disable=unused-argument
+    dsl = FritzboxEcostat(FritzboxInterface())
+    dsl.print_config()
 
-    # pylint: disable=no-value-for-parameter
-    self.assert_stdout("""multigraph cpuload
+    assert capsys.readouterr().out == """multigraph cpuload
 graph_title CPU usage
 graph_vlabel %
 graph_category system
@@ -66,20 +69,19 @@ cache.type GAUGE
 cache.draw AREASTACK
 free.label free
 free.type GAUGE
-free.draw AREASTACK""", dsl.print_config)
+free.draw AREASTACK
+"""
 
-  @unittest.mock.patch.dict(os.environ, {
-    "ecostat_modes": "cpu temp ram INVALID"
-  })
-  def test_print_system_stats(self, fixture_version: str):
-    ecostat = FritzboxEcostat(self._create_interface_mock(fixture_version))
+  def test_print_system_stats(self, fixture_version: str, capsys): # pylint: disable=unused-argument
+    ecostat = FritzboxEcostat(FritzboxInterface())
+    ecostat.print_system_stats()
 
-    # pylint: disable=no-value-for-parameter
-    self.assert_stdout("""multigraph cpuload
+    assert capsys.readouterr().out == """multigraph cpuload
 load.value 10
 multigraph cputemp
 temp.value 71
 multigraph ramusage
 strict.value 17
 cache.value 32.9
-free.value 50.1""", ecostat.print_system_stats)
+free.value 50.1
+"""

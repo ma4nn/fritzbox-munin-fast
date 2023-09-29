@@ -3,32 +3,35 @@
   Unit tests for dsl module
 """
 
-from unittest.mock import Mock
+from unittest.mock import Mock,patch
 import os
 import unittest
 import pytest
 from fritzbox_dsl import FritzboxDsl
+from fritzbox_interface import FritzboxInterface
 from test_base import BaseTestCase
 
+
+@unittest.mock.patch.dict(os.environ, {
+  "dsl_modes": "capacity snr damping errors crc INVALID"
+})
 @pytest.mark.parametrize("fixture_version", ["7590-7.57"])
 class TestFritzboxDsl(BaseTestCase):
+
   @unittest.mock.patch.dict(os.environ, {
     "dsl_modes": "INVALID"
   })
-  def test_config_with_invalid_modes_only(self, fixture_version: str):
-    dsl = FritzboxDsl(self._create_interface_mock(fixture_version))
+  def test_config_with_invalid_modes_only(self, fixture_version: str, capsys): # pylint: disable=unused-argument
+    dsl = FritzboxDsl(FritzboxInterface())
+    dsl.print_config()
 
-    # pylint: disable=no-value-for-parameter
-    self.assert_stdout("", dsl.print_config)
+    assert capsys.readouterr().out == ""
 
-  @unittest.mock.patch.dict(os.environ, {
-    "dsl_modes": "capacity snr damping errors crc INVALID"
-  })
-  def test_config(self, fixture_version: str):
-    dsl = FritzboxDsl(self._create_interface_mock(fixture_version))
+  def test_config(self, fixture_version: str, capsys): # pylint: disable=unused-argument
+    dsl = FritzboxDsl(FritzboxInterface())
+    dsl.print_config()
 
-    # pylint: disable=no-value-for-parameter
-    self.assert_stdout("""multigraph dsl_capacity
+    assert capsys.readouterr().out == """multigraph dsl_capacity
 graph_title Link Capacity
 graph_vlabel bit/s
 graph_args --lower-limit 0
@@ -109,16 +112,14 @@ ses_send.label send severely errored
 ses_send.type DERIVE
 ses_send.graph LINE1
 ses_send.min 0
-ses_send.warning 1""", dsl.print_config)
+ses_send.warning 1
+"""
 
-  @unittest.mock.patch.dict(os.environ, {
-    "dsl_modes": "capacity snr damping errors crc INVALID"
-  })
-  def test_print_dsl_stats(self, fixture_version: str):
-    dsl = FritzboxDsl(self._create_interface_mock(fixture_version))
+  def test_print_dsl_stats(self, fixture_version: str, capsys): # pylint: disable=unused-argument
+    dsl = FritzboxDsl(FritzboxInterface())
+    dsl.print_dsl_stats()
 
-    # pylint: disable=no-value-for-parameter
-    self.assert_stdout("""multigraph dsl_capacity
+    assert capsys.readouterr().out == """multigraph dsl_capacity
 recv.value 139083
 send.value 47102
 multigraph dsl_snr
@@ -134,4 +135,5 @@ ses_recv.value 0
 ses_send.value 0
 multigraph dsl_crc
 recv.value 0
-send.value 0""", dsl.print_dsl_stats)
+send.value 0
+"""

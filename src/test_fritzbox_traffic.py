@@ -4,9 +4,7 @@
 """
 
 from unittest.mock import Mock
-import unittest
 from fritzbox_traffic import FritzboxTraffic
-from test_base import BaseTestCase
 
 def get_fritzstatus_mock() -> Mock:
   mock_fritzstatus = Mock()
@@ -15,14 +13,14 @@ def get_fritzstatus_mock() -> Mock:
 
   return mock_fritzstatus
 
-class TestFritzboxTraffic(BaseTestCase):
+class TestFritzboxTraffic():
   maxDiff = None
 
-  def test_config(self):
+  def test_config(self, capsys):
     traffic = FritzboxTraffic(get_fritzstatus_mock())
+    traffic.print_config()
 
-    # pylint: disable=no-value-for-parameter
-    self.assert_stdout("""graph_title WAN traffic
+    assert capsys.readouterr().out == """graph_title WAN traffic
 graph_args --base 1000
 graph_vlabel bit in (-) / out (+) per ${graph_period}
 graph_category network
@@ -48,16 +46,15 @@ maxup.label MAX
 maxup.type GAUGE
 maxup.negative maxdown
 maxup.draw LINE1
-maxup.info Maximum speed of the WAN interface.""", traffic.print_config)
+maxup.info Maximum speed of the WAN interface.
+"""
 
-  def test_traffic(self):
+  def test_traffic(self, capsys):
     traffic = FritzboxTraffic(get_fritzstatus_mock())
+    traffic.print_traffic()
 
-    # pylint: disable=no-value-for-parameter
-    self.assert_stdout("""down.value 4373
+    assert capsys.readouterr().out == """down.value 4373
 up.value 1024
 maxdown.value 1
-maxup.value 182""", traffic.print_traffic)
-
-if __name__ == '__main__':
-  unittest.main(module=__name__, buffer=True, exit=False)
+maxup.value 182
+"""
