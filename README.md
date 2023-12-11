@@ -51,8 +51,14 @@ Multigraph plugin, showing:
  - CPU load
  - CPU temperature
 
-### Smart Home Temperature
-Plugin: `fritzbox_smart_home_temperature.py`  
+### Smart Home
+Plugin: `fritzbox_smart_home.py`  
+Multigraph plugin, showing:
+ - temperature sensors
+ - switch states
+ - power values
+ - energy consumption values
+
 ![Smart Home Temperature](doc/smart_home_temperature.png)
 
 ### Energy
