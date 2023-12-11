@@ -37,7 +37,7 @@ class FritzboxFileSession:
     with open(statefilename, 'w', encoding='utf8') as statefile:
       statefile.write(session_id)
 
-  def load(self) -> None | str:
+  def load(self) -> "None | str":
     statefilename = get_session_dir() + '/' + self.__get_session_filename()
     if not os.path.exists(statefilename):
       return None
