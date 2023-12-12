@@ -4,6 +4,9 @@
 """
 
 import os
+from typing import Optional
+
+NoneOrString = Optional[str]  # for Python 3.9 compatibility, since 3.10 you can type None | str
 
 def get_session_dir() -> str:
   return str(os.getenv('MUNIN_PLUGSTATE')) + '/fritzbox'
@@ -37,7 +40,7 @@ class FritzboxFileSession:
     with open(statefilename, 'w', encoding='utf8') as statefile:
       statefile.write(session_id)
 
-  def load(self) -> None | str:
+  def load(self) -> NoneOrString:
     statefilename = get_session_dir() + '/' + self.__get_session_filename()
     if not os.path.exists(statefilename):
       return None

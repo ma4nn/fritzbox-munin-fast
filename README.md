@@ -11,10 +11,11 @@ These python scripts are [Munin](http://munin-monitoring.org) plugins for monito
 
 ## Purpose of this Fork
 
-The scripts are build upon the original [fritzbox-munin](https://github.com/Tafkas/fritzbox-munin) with the goal to make use of the modern APIs that FRITZ!OS 7 provides.  
+The scripts are build upon the original [fritzbox-munin](https://github.com/Tafkas/fritzbox-munin) with the goal to make use of the modern APIs that FRITZ!OS 7 provides.
+
 The main differences to the original version are:
 - Compatibility with latest FRITZ!OS version using username/password authentication
-- No HTML Scraping is used
+- No HTML Scraping
 - All data is fetched either through the TR-064 interface or the JSON API
 - Contrary to the original version this fork uses multigraphs: this removes the need to query the same API endpoint multiple times, all multigraph plugins have configuration options to switch individual graphs on and off
 - Support for Smart Home devices, e.g. for measuring temperature
@@ -25,7 +26,7 @@ The main differences to the original version are:
 ## Requirements
 - FRITZ!Box router with FRITZ!OS >= 07.50 (if you are on an older FRITZ!OS version, select an older version of fritzbox-munin-fast by browsing the tags in this repository)
 - Munin 1.4.0 or later is required
-- Python >= 3.10
+- Python >= 3.9
    
 ## Available Plugins
 
