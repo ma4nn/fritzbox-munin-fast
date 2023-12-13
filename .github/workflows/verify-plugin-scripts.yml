@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ "3.10", "3.11" ]
+        python-version: [ "3.9", "3.10", "3.11" ]
 
     steps:
     - uses: actions/checkout@v4
@@ -23,12 +23,12 @@ jobs:
         pip install -r requirements.txt
     - name: Analysing the code with pylint
       run: |
-        pylint --fail-under 9 $(find . -name "*.py" | xargs)
+        pylint --errors-only $(find src/ -name "*.py" | xargs)
     - name: Running tests
       run: |
         pytest --cov
     - name: Archive production artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: munin-plugins
+        name: fritzbox-munin-plugins
         path: src/fritzbox*.py

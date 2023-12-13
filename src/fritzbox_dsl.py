@@ -25,7 +25,7 @@ from fritzbox_interface import FritzboxInterface
 from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler
 
 PAGE = 'data.lua'
-PARAMS = {'xhr':1, 'lang':'de', 'page':'dslStat', 'xhrId':'refresh', 'useajax':1, 'no_sidrenew':None}
+PARAMS = {'xhr': 1, 'lang': 'de', 'page': 'dslStat', 'xhrId': 'refresh', 'useajax': 1, 'no_sidrenew': None}
 
 TITLES = {
   'capacity': 'Link Capacity',
