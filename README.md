@@ -1,26 +1,28 @@
 # Munin Plugins for FRITZ!Box
 
-A collection of Munin plugins to monitor your AVM FRITZ!Box router. The scripts have been developed using a FRITZ!Box 7590 running FRITZ!OS 7.50 and a FRITZ!WLAN Repeater 1750E running FRITZ!OS 7.27.
+A collection of [Munin](https://munin-monitoring.org) plugins to monitor your [AVM FRITZ!Box](https://avm.de/produkte/fritzbox/) router.
+
+So far the following FRITZ!Box models have been confirmed working:
+- FritzBox 7590 with FRITZ!OS Version 7.28 to 7.57
 
 If you are using the scripts on a different FRITZ!Box model please let me know by
 
 - opening an issue
 - submitting a pull request
 
-These python scripts are [Munin](http://munin-monitoring.org) plugins for monitoring the [FRITZ!Box](https://avm.de/produkte/fritzbox/) router by AVM. 
-
 ## Purpose of this Fork
 
-The scripts are build upon the original [fritzbox-munin](https://github.com/Tafkas/fritzbox-munin) with the goal to make use of the modern APIs that FRITZ!OS 7 provides.
+These scripts are build upon the original [fritzbox-munin](https://github.com/Tafkas/fritzbox-munin) with the goal to make 
+use of the more modern APIs that FRITZ!OS 7 provides.
 
 The main differences to the original version are:
 - Compatibility with latest FRITZ!OS version using username/password authentication
-- No HTML Scraping
+- No HTML scraping
 - All data is fetched either through the TR-064 interface or the JSON API
 - Contrary to the original version this fork uses multigraphs: this removes the need to query the same API endpoint multiple times, all multigraph plugins have configuration options to switch individual graphs on and off
 - Support for Smart Home devices, e.g. for measuring temperature
-- Complete refactoring of the Python code base to make it more robust, use modern language features like type hinting and reuse identical code
-- Add possibility to connect to FRITZ!Box via TLS
+- Complete refactoring of the Python code base to make it more robust, use modern language features like type hinting, tests and remove code duplication
+- Added possibility to connect to FRITZ!Box via TLS
 - Added automated testing via Github Actions
 
 ## Requirements
@@ -135,7 +137,6 @@ You can split the graphs of your FRITZ!Box from the localhost graphs by followin
         [home.yourhost.net;server]
             address 127.0.0.1
             use_node_name yes
-
 
         [home.yourhost.net;fritzbox]
             address 127.0.0.1

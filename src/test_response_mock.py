@@ -1,6 +1,7 @@
 import os
 from unittest.mock import MagicMock
 
+
 class ResponseMock: # pylint: disable=too-few-public-methods
   version: str
 
