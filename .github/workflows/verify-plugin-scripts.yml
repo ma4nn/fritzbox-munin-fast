@@ -23,7 +23,7 @@ jobs:
         pip install -r requirements.txt
     - name: Analysing the code with pylint
       run: |
-        pylint --errors-only $(find . -name "*.py" | xargs)
+        pylint --errors-only $(find src/ -name "*.py" | xargs)
     - name: Running tests
       run: |
         pytest --cov
