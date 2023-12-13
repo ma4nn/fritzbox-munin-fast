@@ -20,12 +20,8 @@ class FritzboxSmartHome(MuninPluginInterface):
     smart_home_data = []
 
     for i in range(0, 20):
-      try:
-        data = self.__connection.call_action('X_AVM-DE_Homeauto1', 'GetGenericDeviceInfos', arguments={'NewIndex': i})
-        smart_home_data.append(data)
-      except Exception:
-        # smart home device index does not exist, so we stop here
-        break
+      data = self.__connection.call_action('X_AVM-DE_Homeauto1', 'GetGenericDeviceInfos', arguments={'NewIndex': i})
+      smart_home_data.append(data)
 
     return smart_home_data
 
@@ -34,21 +30,21 @@ class FritzboxSmartHome(MuninPluginInterface):
 
     print("multigraph temperatures")
     for data in smart_home_data:
-      if data['NewTemperatureIsValid'] == 'VALID':
+      if 'NewTemperatureIsValid' in data and data['NewTemperatureIsValid'] == 'VALID':
         print (f"t{data['NewDeviceId']}.value {float(data['NewTemperatureCelsius']) / 10}")
     print("multigraph energy")
     for data in smart_home_data:
-      if data['NewMultimeterIsValid'] == 'VALID':
+      if 'NewMultimeterIsValid' in data and  data['NewMultimeterIsValid'] == 'VALID':
         print (f"e{data['NewDeviceId']}.value {data['NewMultimeterEnergy']}")
     print("multigraph powers")
     for data in smart_home_data:
-      if data['NewMultimeterIsValid'] == 'VALID':
+      if 'NewMultimeterIsValid' in data and data['NewMultimeterIsValid'] == 'VALID':
         print (f"p{data['NewDeviceId']}.value {float(data['NewMultimeterPower']) / 100}")
     print("multigraph states")
     for data in smart_home_data:
-      if data['NewSwitchIsValid'] == 'VALID':
+      if 'NewSwitchIsValid' in data and data['NewSwitchIsValid'] == 'VALID':
         state = 1
-        if data['NewSwitchState'] == 'OFF':
+        if 'NewSwitchState' in data and data['NewSwitchState'] == 'OFF':
           state = 0
         print (f"s{data['NewDeviceId']}.value {state}")
 
@@ -61,11 +57,11 @@ class FritzboxSmartHome(MuninPluginInterface):
     print("graph_scale no")
 
     for data in smart_home_data:
-      if data['NewTemperatureIsValid'] == 'VALID':
+      if 'NewTemperatureIsValid' in data and data['NewTemperatureIsValid'] == 'VALID':
         print (f"t{data['NewDeviceId']}.label {data['NewDeviceName']}")
         print (f"t{data['NewDeviceId']}.type GAUGE")
         print (f"t{data['NewDeviceId']}.graph LINE")
-        print (f"t{data['NewDeviceId']}.info Temperature [{data['NewProductName']}], Offset: {float(data['NewTemperatureOffset']) / 10} C")
+        print (f"t{data['NewDeviceId']}.info Temperature [{data['NewProductName']}], Offset: {float(data['NewTemperatureOffset']) / 10}°C")
 
     print("multigraph energy")
     print("graph_title Smart Home energy consumption")
@@ -74,7 +70,7 @@ class FritzboxSmartHome(MuninPluginInterface):
     print("graph_scale no")
     print("graph_period hour")
     for data in smart_home_data:
-      if data['NewMultimeterIsValid'] == 'VALID':
+      if 'NewMultimeterIsValid' in data and data['NewMultimeterIsValid'] == 'VALID':
         print (f"e{data['NewDeviceId']}.label {data['NewDeviceName']}")
         print (f"e{data['NewDeviceId']}.type DERIVE")
         print (f"e{data['NewDeviceId']}.graph LINE")
@@ -86,7 +82,7 @@ class FritzboxSmartHome(MuninPluginInterface):
     print("graph_category sensors")
     print("graph_scale no")
     for data in smart_home_data:
-      if data['NewMultimeterIsValid'] == 'VALID':
+      if 'NewMultimeterIsValid' in data and data['NewMultimeterIsValid'] == 'VALID':
         print (f"p{data['NewDeviceId']}.label {data['NewDeviceName']}")
         print (f"p{data['NewDeviceId']}.type GAUGE")
         print (f"p{data['NewDeviceId']}.graph LINE")
@@ -98,7 +94,7 @@ class FritzboxSmartHome(MuninPluginInterface):
     print("graph_category sensors")
     print("graph_scale no")
     for data in smart_home_data:
-      if data['NewSwitchIsValid'] == 'VALID':
+      if 'NewSwitchIsValid' in data and data['NewSwitchIsValid'] == 'VALID':
         print (f"s{data['NewDeviceId']}.label {data['NewDeviceName']}")
         print (f"s{data['NewDeviceId']}.type GAUGE")
         print (f"s{data['NewDeviceId']}.graph LINE")
