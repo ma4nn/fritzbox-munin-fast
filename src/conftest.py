@@ -1,4 +1,4 @@
-from unittest.mock import patch,MagicMock
+from unittest.mock import patch
 import pytest
 from test_response_mock import ResponseMock
 from test_fritzconnection_mock import FritzConnectionMock
@@ -7,7 +7,7 @@ from test_fritzconnection_mock import FritzConnectionMock
 
 
 @pytest.fixture(autouse=True)
-def fixture_version(request): # request param is fixture
+def fixture_version(request):  # request param is fixture
   with patch('requests.request', side_effect=ResponseMock) as mock_requests:
     mock_requests.side_effect.version = request.param if hasattr(request, "param") else None
     yield
@@ -15,4 +15,4 @@ def fixture_version(request): # request param is fixture
 
 @pytest.fixture(autouse=True)
 def connection(request):
-  return FritzConnectionMock(version = request.param if hasattr(request, "param") else None)
+  return FritzConnectionMock(version=request.param if hasattr(request, "param") else None)

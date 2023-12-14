@@ -10,9 +10,9 @@ from fritzbox_smart_home import FritzboxSmartHome
 
 @pytest.mark.parametrize("connection", ["7590-7.57"], indirect=True)
 class TestFritzboxSmartHome:
-  def test_config(self, connection: MagicMock, capsys): # pylint: disable=unused-argument
-    smart_home = FritzboxSmartHome(connection)
-    smart_home.print_config()
+  def test_config(self, connection: MagicMock, capsys):  # pylint: disable=unused-argument
+    sut = FritzboxSmartHome(connection)
+    sut.print_config()
 
     assert capsys.readouterr().out == """multigraph temperatures
 graph_title Smart Home temperature
@@ -53,9 +53,9 @@ s16.graph LINE
 s16.info Switch state [FRITZ!DECT 210]
 """
 
-  def test_smart_home(self, connection: MagicMock, capsys): # pylint: disable=unused-argument
-    uptime = FritzboxSmartHome(connection)
-    uptime.print_stats()
+  def test_smart_home(self, connection: MagicMock, capsys):  # pylint: disable=unused-argument
+    sut = FritzboxSmartHome(connection)
+    sut.print_stats()
 
     assert capsys.readouterr().out == """multigraph temperatures
 t16.value 7.0
@@ -65,4 +65,17 @@ multigraph powers
 p16.value 0.0
 multigraph states
 s16.value 0
+"""
+
+  def test_smart_home_empty_devices(self, capsys):  # pylint: disable=unused-argument
+    connection = MagicMock()
+    connection.get_device_information_list.return_value = {}
+
+    sut = FritzboxSmartHome(connection)
+    sut.print_stats()
+
+    assert capsys.readouterr().out == """multigraph temperatures
+multigraph energy
+multigraph powers
+multigraph states
 """
