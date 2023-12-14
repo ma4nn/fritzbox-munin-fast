@@ -18,7 +18,12 @@ class FritzConnectionMock: # pylint: disable=too-few-public-methods
     return json_object[index] if len(json_object) > index else {}
 
   def get_device_information_list(self, *args, **kwargs) -> {}:
-    file_name = 'smart_home_devices.json'
+    return self.__get_fixture('smart_home_devices.json')
+
+  def get_monitor_data(self) -> {}:
+    return self.__get_fixture('monitor_data.json')
+
+  def __get_fixture(self, file_name):
     file_dir = f"{os.path.dirname(__file__)}/fixtures/fritzbox{self.version}"
     with open(file_dir + "/" + file_name, "r", encoding="utf-8") as file:
       return json.load(file)
