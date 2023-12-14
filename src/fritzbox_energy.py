@@ -48,8 +48,10 @@ hourLoc = {"de": "Stunden", "en": "hours"}
 minutesLoc = {"de": "Minuten", "en": "minutes"}
 pattern = re.compile(patternLoc[locale])
 
+
 def get_modes():
   return os.getenv('energy_modes').split(' ') if (os.getenv('energy_modes')) else []
+
 
 def get_type():
   return os.getenv('energy_product')
