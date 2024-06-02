@@ -3,12 +3,12 @@
   Unit tests for link saturation module
 """
 
-import pytest
 from unittest.mock import MagicMock
+import pytest
 from fritzbox_link_saturation import FritzboxLinkSaturation
 
 
-@pytest.mark.parametrize("connection", ["7590-7.57"], indirect=True)
+@pytest.mark.parametrize("connection", ["7590-7.57", "7530ax-7.80"], indirect=True)
 class TestFritzboxLinkSaturation():
   def test_config(self, connection: MagicMock, capsys):
     sut = FritzboxLinkSaturation(connection)

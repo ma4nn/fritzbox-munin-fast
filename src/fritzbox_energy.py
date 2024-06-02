@@ -26,6 +26,8 @@ import re
 from fritzbox_interface import FritzboxInterface
 from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler
 
+# @todo refactor
+
 PAGE = 'data.lua'
 PARAMS = {'xhr':1, 'lang':'de', 'page':'energy', 'xhrId':'all', 'useajax':1, 'no_sidrenew':None}
 DEVICES = ['system', 'cpu', 'wifi', 'dsl', 'ab', 'usb', 'lan']
@@ -69,7 +71,7 @@ class FritzboxEnergy(MuninPluginInterface):
     if device_type == "repeater":
       return DEVICES_REPEATER
 
-    raise Exception("No such type")
+    raise ValueError('No such type')
 
   def print_stats(self):
     """print the current energy statistics"""

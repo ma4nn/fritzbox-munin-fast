@@ -7,7 +7,7 @@
 
 from fritzconnection.lib.fritzhomeauto import FritzHomeAutomation
 from fritzbox_config import FritzboxConfig
-from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler
+from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler,print_debug
 
 
 class FritzboxSmartHome(MuninPluginInterface):
@@ -18,6 +18,8 @@ class FritzboxSmartHome(MuninPluginInterface):
 
   def print_stats(self):
     smart_home_data = self.__connection.get_device_information_list()
+    print_debug('got result from fritzbox:')
+    print_debug(smart_home_data)
 
     print("multigraph temperatures")
     for data in smart_home_data:

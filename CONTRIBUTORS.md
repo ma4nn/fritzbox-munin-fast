@@ -1,4 +1,6 @@
-## fritzbox-munin-fast contributors
+## fritzbox-munin-fast Contributors
+
+Special thanks for all the people who had helped this project so far:
 
  - Bob van de Vijver ([bobvandevijver](https://github.com/bobvandevijver))
  - Framps ([framps](https://github.com/framps))

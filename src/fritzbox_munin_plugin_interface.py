@@ -1,5 +1,7 @@
+import json
 import os
 import sys
+import traceback
 
 
 class MuninPluginInterface:
@@ -21,4 +23,19 @@ def main_handler(plugin: MuninPluginInterface):
     try:
       plugin.print_stats()
     except Exception as e:
+      print_exception()
       sys.exit(f"Couldn't retrieve Fritzbox stats of {os.path.basename(sys.argv[0])}/{type(plugin).__name__}: {str(e)}")
+
+
+def print_debug(message: any):
+  if os.getenv('MUNIN_DEBUG') != '1':
+    return
+
+  if isinstance(message, (dict, list)):
+    message = json.dumps(message)
+
+  print(message)
+
+
+def print_exception():
+  print_debug(traceback.format_exc())

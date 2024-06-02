@@ -1,9 +1,13 @@
 # Munin Plugins for FRITZ!Box
 
-A collection of [Munin](https://munin-monitoring.org) plugins to monitor your [AVM FRITZ!Box](https://avm.de/produkte/fritzbox/) router.
+![build status](https://github.com/ma4nn/fritzbox-munin-fast/actions/workflows/verify-plugin-scripts.yml/badge.svg)
+
+A collection of [Munin](https://munin-monitoring.org) plugins to monitor your [AVM FRITZ!Box](https://avm.de/produkte/fritzbox/) router.  
+The values are retrieved via the [fritzconnection](https://pypi.org/project/fritzconnection/) project.
 
 So far the following FRITZ!Box models have been confirmed working:
 - FritzBox 7590 with FRITZ!OS Version 7.28 to 7.57
+- FritzBox 7530 AX with FRITZ!OS Version 7.80
 
 If you are using the scripts on a different FRITZ!Box model please let me know by
 
@@ -23,7 +27,7 @@ The main differences to the original version are:
 - Support for Smart Home devices, e.g. for measuring temperature
 - Complete refactoring of the Python code base to make it more robust, use modern language features like type hinting, tests and remove code duplication
 - Added possibility to connect to FRITZ!Box via TLS
-- Added automated testing via Github Actions
+- Added automated testing via GitHub Actions
 
 ## Requirements
 - FRITZ!Box router with FRITZ!OS >= 07.50 (if you are on an older FRITZ!OS version, select an older version of fritzbox-munin-fast by browsing the tags in this repository)
@@ -150,7 +154,7 @@ You can split the graphs of your FRITZ!Box from the localhost graphs by followin
 
 To manually test a plugin use
 ```
-munin-run --debug fritzbox_connection_uptime.py
+munin-run --pidebug fritzbox_connection_uptime.py
 ```
 
 ### Unit Tests

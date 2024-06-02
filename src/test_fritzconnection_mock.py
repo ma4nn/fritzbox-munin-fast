@@ -9,6 +9,9 @@ class FritzConnectionMock: # pylint: disable=too-few-public-methods
     self.version = version
 
   def call_action(self, *args, **kwargs) -> {}:
+    if args[0] == 'WANDSLInterfaceConfig1' and args[1] == 'GetInfo':
+      return self.__get_fixture('dsl_info.json')
+
     index = 0
     if 'arguments' in kwargs and 'NewIndex' in kwargs['arguments']:
       index = kwargs['arguments']['NewIndex']

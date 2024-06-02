@@ -21,8 +21,12 @@
 """
 
 import os
+from fritzconnection import FritzConnection
+from fritzbox_config import FritzboxConfig
 from fritzbox_interface import FritzboxInterface
-from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler
+from fritzbox_munin_plugin_interface import MuninPluginInterface, main_handler, print_debug
+
+# @todo refactor
 
 PAGE = 'data.lua'
 PARAMS = {'xhr': 1, 'lang': 'de', 'page': 'dslStat', 'xhrId': 'refresh', 'useajax': 1, 'no_sidrenew': None}
@@ -55,40 +59,48 @@ VLABELS = {
   'ecc': 'n',
 }
 
+
 def get_modes():
   return os.getenv('dsl_modes').split(' ') if (os.getenv('dsl_modes')) else []
+
 
 def print_graph(name, recv, send, prefix=""):
   if name:
     print("multigraph " + name)
-  print(prefix + "recv.value " + recv)
-  print(prefix + "send.value " + send)
+  print(prefix + "recv.value " + str(recv))
+  print(prefix + "send.value " + str(send))
+
 
 class FritzboxDsl(MuninPluginInterface):
   __connection = None
+  __fb_connection = None
 
-  def __init__(self, fritzbox_interface: FritzboxInterface):
+  def __init__(self, fritzbox_interface: FritzboxInterface, fritzbox_connection: FritzConnection):
     self.__connection = fritzbox_interface
+    self.__fb_connection = fritzbox_connection
 
   def print_stats(self):
     """print the current DSL statistics"""
 
     modes = get_modes()
     jsondata = self.__connection.post_page_with_login(PAGE, data=PARAMS)['data']
+    info = self.__fb_connection.call_action('WANDSLInterfaceConfig1', 'GetInfo')
+    print_debug('result from fritzconnection api:')
+    print_debug(info)
 
     # us=upstream, ds=downstream
 
     if 'capacity' in modes:
-      print_graph("dsl_capacity", jsondata['negotiatedValues'][2]['val'][0]['ds'], jsondata['negotiatedValues'][2]['val'][0]['us'])
+      print_graph("dsl_capacity", info['NewDownstreamMaxRate'], info['NewUpstreamMaxRate'])
 
     if 'rate' in modes:
-      print_graph("dsl_rate", jsondata['negotiatedValues'][3]['val'][0]['ds'], jsondata['negotiatedValues'][3]['val'][0]['us'])
+      print_graph("dsl_rate", info['NewDownstreamCurrRate'], info['NewUpstreamCurrRate'])
 
-    if 'snr' in modes: # Störabstandsmarge
-      print_graph("dsl_snr", jsondata['negotiatedValues'][12]['val'][0]['ds'], jsondata['negotiatedValues'][12]['val'][0]['us'])
+    if 'snr' in modes:  # Störabstandsmarge
+      print_graph("dsl_snr", int(info['NewDownstreamNoiseMargin']/10), int(info['NewUpstreamNoiseMargin']/10))
 
-    if 'damping' in modes: # Leitungsdämpfung
-      print_graph("dsl_damping", jsondata['negotiatedValues'][13]['val'][0]['ds'], jsondata['negotiatedValues'][13]['val'][0]['us'])
+    if 'damping' in modes:  # Leitungsdämpfung
+      print_graph("dsl_damping", int(info['NewDownstreamAttenuation']/10), int(info['NewUpstreamAttenuation']/10))
 
     if 'errors' in modes:
       print_graph("dsl_errors", jsondata['errorCounters'][1]['val'][0]['ds'], jsondata['errorCounters'][1]['val'][0]['us'], prefix="es_")
@@ -103,11 +115,11 @@ class FritzboxDsl(MuninPluginInterface):
 
   def print_config(self):
     modes = get_modes()
-    max_values = self.__retrieve_max_values()
 
     for mode in ['capacity', 'rate', 'snr', 'damping', 'crc']:
-      if not mode in modes:
+      if mode not in modes:
         continue
+
       print("multigraph dsl_" + mode)
       print("graph_title " + TITLES[mode])
       print("graph_vlabel " + VLABELS[mode])
@@ -120,7 +132,6 @@ class FritzboxDsl(MuninPluginInterface):
         print(p + ".min 0")
         if mode in ['capacity', 'rate']:
           print(p + ".cdef " + p + ",1000,*")
-          print(p + ".warning " + str(max_values[p]))
 
     if 'errors' in modes:
       print("multigraph dsl_errors")
@@ -150,19 +161,7 @@ class FritzboxDsl(MuninPluginInterface):
         print(p + ".min 0")
         print(p + ".warning 1")
 
-  def __retrieve_max_values(self):
-    max_values = {'send': 0, 'recv': 0}
-    jsondata = self.__connection.post_page_with_login(PAGE, data=PARAMS)['data']
-
-    if not 'negotiatedValues' in jsondata:
-      return max_values
-
-    # retrieve values from "Leitungskapazitaet"
-    max_values['send'] = int(float(jsondata['negotiatedValues'][2]['val'][0]['us']))
-    max_values['recv'] = int(float(jsondata['negotiatedValues'][2]['val'][0]['ds']))
-
-    return max_values
-
 
 if __name__ == "__main__":
-  main_handler(FritzboxDsl(FritzboxInterface()))
+  config = FritzboxConfig()
+  main_handler(FritzboxDsl(FritzboxInterface(), FritzConnection(address=config.server, user=config.user, password=config.password, use_tls=config.use_tls)))

@@ -35,6 +35,7 @@ import requests
 from lxml import etree
 from fritzbox_config import FritzboxConfig
 from fritzbox_file_session import FritzboxFileSession
+from fritzbox_munin_plugin_interface import print_debug
 
 
 class FritzboxInterface:
@@ -66,7 +67,7 @@ class FritzboxInterface:
     except JSONDecodeError as json_exception:
       # Perhaps session expired, let's clear the session and try again
       self.__session.clear()
-      sys.exit('ERROR: Did not receive valid JSON data from FritzBox, so automatically cleared the session, please try again: ' + str(json_exception) + "; data: " + data)
+      sys.exit('ERROR: Did not receive valid JSON data from FritzBox, so automatically cleared the session, please try again: ' + str(json_exception) + ")")
 
     return json_data
 
@@ -148,7 +149,7 @@ class FritzboxInterface:
 
     return session_id
 
-  def __call_page_with_login(self, method: Callable[[], str], page, data=None) -> str:
+  def __call_page_with_login(self, method: Callable[[str, str, any], str], page, data=None) -> str:
     if data is None:
       data = {}
     session_id = self.__session.load()
@@ -156,12 +157,10 @@ class FritzboxInterface:
     if session_id is not None:
       try:
         return method(session_id, page, data)
-      except (requests.exceptions.HTTPError,
-             requests.exceptions.SSLError) as request_exception:
+      except requests.exceptions.HTTPError as request_exception:
         code = request_exception.response.status_code
-        if code != 403:
-          print(request_exception)
-          sys.exit(1)
+        if code != 403:  # otherwise (= unauthorized) init a new session below
+          raise request_exception
 
     session_id = self.__get_session_id()
 
@@ -191,7 +190,7 @@ class FritzboxInterface:
 
     :param session_id: a valid session id
     :param page: the page you are requesting
-    :param params: GET parameters in a map
+    :param data: GET parameters in a map
     :return: the content of the page
     """
 
@@ -208,5 +207,8 @@ class FritzboxInterface:
   def __send_request(self, method: str, page: str, **kwargs) -> requests.Response:
     result = requests.request(method, f"{self.__base_uri}/{page}", **kwargs, verify=self.config.certificate_file, timeout=self.config.timeout)
     result.raise_for_status()
+
+    print_debug(f"response for {method} request to {page} from fritzbox:")
+    print_debug(result.text)
 
     return result

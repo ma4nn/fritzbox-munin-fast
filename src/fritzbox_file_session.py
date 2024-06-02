@@ -6,6 +6,7 @@
 import os
 from typing import Optional
 
+
 def get_session_dir() -> str:
   return str(os.getenv('MUNIN_PLUGSTATE')) + '/fritzbox'
 
@@ -18,7 +19,7 @@ class FritzboxFileSession:
 
   def __init__(self, server: str, user: str, port: int):
     if self.__separator in server or self.__separator in user:
-      raise Exception("Reserved string \"" + self.__separator + "__\" in server or user name")
+      raise ValueError(f'Reserved string "{self.__separator}" in server or user name')
 
     self.__server = server
     self.__user = user

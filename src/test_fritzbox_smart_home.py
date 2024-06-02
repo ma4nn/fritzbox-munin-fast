@@ -3,12 +3,12 @@
   Unit tests for smart home temperature module
 """
 
-import pytest
 from unittest.mock import MagicMock
+import pytest
 from fritzbox_smart_home import FritzboxSmartHome
 
 
-@pytest.mark.parametrize("connection", ["7590-7.57"], indirect=True)
+@pytest.mark.parametrize("connection", ["7590-7.57", "7530ax-7.80"], indirect=True)
 class TestFritzboxSmartHome:
   def test_config(self, connection: MagicMock, capsys):  # pylint: disable=unused-argument
     sut = FritzboxSmartHome(connection)

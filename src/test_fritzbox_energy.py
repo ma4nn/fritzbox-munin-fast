@@ -15,7 +15,7 @@ from fritzbox_interface import FritzboxInterface
   "energy_modes": "power devices uptime INVALID",
   "energy_product": "DSL"
 })
-@pytest.mark.parametrize("fixture_version", ["7590-7.28"], indirect=True)
+@pytest.mark.parametrize("fixture_version", ["7590-7.28", "7530ax-7.80"], indirect=True)
 class TestFritzboxEnergy():
 
   @unittest.mock.patch.dict(os.environ, {

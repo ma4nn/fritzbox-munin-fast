@@ -22,7 +22,7 @@
 from statistics import mean
 from fritzconnection.lib.fritzstatus import FritzStatus
 from fritzbox_config import FritzboxConfig
-from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler
+from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler,print_debug
 
 
 LABELS_UP = ['realtime', 'high', 'default', 'low']
@@ -37,6 +37,8 @@ class FritzboxLinkSaturation(MuninPluginInterface):
 
   def print_stats(self):
     group_data = self.__connection.get_monitor_data()
+    print_debug('got result from fritzbox:')
+    print_debug(group_data)
 
     maxup = group_data['Newmax_us']
     maxdown = group_data['Newmax_ds']

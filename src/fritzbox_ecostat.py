@@ -24,6 +24,8 @@ import os
 from fritzbox_interface import FritzboxInterface
 from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler
 
+# @todo refactor
+
 PAGE = 'data.lua'
 PARAMS = {'xhr':1, 'lang':'de', 'page':'ecoStat', 'xhrId':'all', 'useajax':1, 'no_sidrenew':None}
 RAMLABELS = ['strict', 'cache', 'free']

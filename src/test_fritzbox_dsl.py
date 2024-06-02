@@ -3,7 +3,7 @@
   Unit tests for dsl module
 """
 
-from unittest.mock import Mock
+from unittest.mock import MagicMock
 import os
 import unittest
 import pytest
@@ -14,20 +14,21 @@ from fritzbox_interface import FritzboxInterface
 @unittest.mock.patch.dict(os.environ, {
   "dsl_modes": "capacity snr damping errors crc INVALID"
 })
-@pytest.mark.parametrize("fixture_version", ["7590-7.57"], indirect=True)
+@pytest.mark.parametrize("fixture_version", ["7590-7.57", "7530ax-7.80"], indirect=True)
+@pytest.mark.parametrize("connection", ["7530ax-7.80"], indirect=True)
 class TestFritzboxDsl():
 
   @unittest.mock.patch.dict(os.environ, {
     "dsl_modes": "INVALID"
   })
-  def test_config_with_invalid_modes_only(self, fixture_version: str, capsys): # pylint: disable=unused-argument
-    dsl = FritzboxDsl(FritzboxInterface())
+  def test_config_with_invalid_modes_only(self, connection: MagicMock, fixture_version: str, capsys): # pylint: disable=unused-argument
+    dsl = FritzboxDsl(FritzboxInterface(), connection)
     dsl.print_config()
 
     assert capsys.readouterr().out == ""
 
-  def test_config(self, fixture_version: str, capsys): # pylint: disable=unused-argument
-    dsl = FritzboxDsl(FritzboxInterface())
+  def test_config(self, connection: MagicMock, fixture_version: str, capsys): # pylint: disable=unused-argument
+    dsl = FritzboxDsl(FritzboxInterface(), connection)
     dsl.print_config()
 
     assert capsys.readouterr().out == """multigraph dsl_capacity
@@ -40,13 +41,11 @@ recv.type GAUGE
 recv.graph LINE1
 recv.min 0
 recv.cdef recv,1000,*
-recv.warning 139083
 send.label send
 send.type GAUGE
 send.graph LINE1
 send.min 0
 send.cdef send,1000,*
-send.warning 47102
 multigraph dsl_snr
 graph_title Signal-to-Noise Ratio
 graph_vlabel dB
@@ -114,8 +113,8 @@ ses_send.min 0
 ses_send.warning 1
 """
 
-  def test_print_dsl_stats(self, fixture_version: str, capsys): # pylint: disable=unused-argument
-    dsl = FritzboxDsl(FritzboxInterface())
+  def test_print_dsl_stats(self, connection: MagicMock, fixture_version: str, capsys): # pylint: disable=unused-argument
+    dsl = FritzboxDsl(FritzboxInterface(), connection)
     dsl.print_stats()
 
     assert capsys.readouterr().out == """multigraph dsl_capacity
