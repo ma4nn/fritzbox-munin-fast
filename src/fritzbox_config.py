@@ -1,16 +1,17 @@
 import os
 
+
 # pylint: disable=too-few-public-methods
 class FritzboxConfig:
   """the server address of the Fritzbox (ip or name)"""
   server = "fritz.box"
   """the port the Fritzbox webserver runs on"""
-  port = None # defaults to 80 for use_tls=False, 443 for use_tls=True
+  port = None  # defaults to 80 for use_tls=False, 443 for use_tls=True
   """the user name to log into the Fritzbox webinterface"""
   user = ""
   """the password to log into the Fritzbox webinterface"""
   password = ""
-  use_tls = True
+  use_tls = False
   certificate_file = False
   timeout = 60
 
