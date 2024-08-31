@@ -7,7 +7,7 @@ The values are retrieved via the [fritzconnection](https://pypi.org/project/frit
 
 So far the following FRITZ!Box models have been confirmed working:
 - FritzBox 7590 with FRITZ!OS Version 7.28 to 7.57
-- FritzBox 7530 AX with FRITZ!OS Version 7.80
+- FritzBox 7530 AX with FRITZ!OS Version 7.80 to 7.81
 
 If you are using the scripts on a different FRITZ!Box model please let me know by
 
@@ -30,7 +30,7 @@ The main differences to the original version are:
 - Added automated testing via GitHub Actions
 
 ## Requirements
-- FRITZ!Box router with FRITZ!OS >= 07.50 (if you are on an older FRITZ!OS version, select an older version of fritzbox-munin-fast by browsing the tags in this repository)
+- FRITZ!Box router with FRITZ!OS >= 7.50 (if you are on an older FRITZ!OS version, select an older version of fritzbox-munin-fast by browsing the tags in this repository)
 - Munin 1.4.0 or later is required
 - Python >= 3.9
    
@@ -95,17 +95,18 @@ Multigraph plugin, showing for 2.4GHz and 5GHz
 
         pip install -r requirements.txt
 
-1. Make sure the FRITZ!Box has UPnP status information enabled. (web interface: _Home Network > Network > Network Settings > Universal Plug & Play (UPnP)_)
+1. Make sure the FRITZ!Box has UPnP status information enabled. (web interface: _Home Network → Network → Network Settings → Universal Plug & Play (UPnP)_)
 
 1. Copy all the scripts from the [published release](https://github.com/ma4nn/fritzbox-munin-fast/releases) to `/usr/share/munin/plugins`
 
-1. (optional) If you want to connect to FRITZ!Box using SSL, download the Fritz certificate (web interface: _Internet > Freigaben > FritzBox Dienste > Zertifikat > Zertifikat herunterladen_) and save it to `/etc/munin/box.cer`.
+1. (optional) If you want to connect to FRITZ!Box using SSL, download the Fritz certificate (web interface: _Internet → Freigaben → FritzBox Dienste → Zertifikat → Zertifikat herunterladen_) and save it to `/etc/munin/box.cer`.
+   The certificate might change after a FRITZ!Box Update.
 
 1. Create entry in `/etc/munin/plugin-conf.d/munin-node`:
 
         [fritzbox_*]
-        env.fritzbox_password <fritzbox_password>
         env.fritzbox_user <fritzbox_user>
+        env.fritzbox_password <fritzbox_password>
         env.fritzbox_use_tls true
         host_name fritzbox
    
@@ -118,11 +119,11 @@ Multigraph plugin, showing for 2.4GHz and 5GHz
 
 1. Restart the munin-node daemon: `service munin-node restart`.
 
-1. Done. You should now start to see the charts on the Munin pages!
+1. Done. You should now start to see the charts on the Munin pages🥳
 
 ## Localization
 
-The `fritzbox_energy` script depends on the language selected in your FRITZ!Box. Currently, two locales are
+The `fritzbox_energy.py` script depends on the language selected in your FRITZ!Box. Currently, two locales are
 supported:
 
 1. German: `de` (default)
