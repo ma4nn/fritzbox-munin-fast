@@ -7,7 +7,7 @@ The values are retrieved via the [fritzconnection](https://pypi.org/project/frit
 
 So far the following FRITZ!Box models have been confirmed working:
 - FritzBox 7590 with FRITZ!OS Version 7.28 to 7.57
-- FritzBox 7530 AX with FRITZ!OS Version 7.80 to 7.81
+- FritzBox 7530 AX with FRITZ!OS Version 7.80 to 8.00
 
 If you are using the scripts on a different FRITZ!Box model please let me know by
 
