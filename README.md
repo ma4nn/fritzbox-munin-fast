@@ -6,21 +6,24 @@ A collection of [Munin](https://munin-monitoring.org) plugins to monitor your [A
 The values are retrieved via the [fritzconnection](https://pypi.org/project/fritzconnection/) project.
 
 So far the following FRITZ!Box models have been confirmed working:
-- FritzBox 7590 with FRITZ!OS Version 7.28 to 7.57
-- FritzBox 7530 AX with FRITZ!OS Version 7.80 to 8.02
+
+| Model            | Fritz!OS Version(s) |
+|------------------|---------------------|
+| FritzBox 7590    | 7.28 - 7.57         |
+| FritzBox 7530 AX | 7.80 - 8.02         |
 
 If you are using the scripts on a different FRITZ!Box model please let me know by
 
-- opening an issue
-- submitting a pull request
+- Opening an issue
+- Submitting a pull request
 
 ## Purpose of this Fork
 
 These scripts are build upon the original [fritzbox-munin](https://github.com/Tafkas/fritzbox-munin) with the goal to make 
-use of the more modern APIs that FRITZ!OS 7 provides.
+use of the more modern APIs that Fritz!OS 7 provides.
 
 The main differences to the original version are:
-- Compatibility with latest FRITZ!OS version using username/password authentication
+- Compatibility with latest Fritz!OS version using username/password authentication
 - No HTML scraping
 - All data is fetched either through the TR-064 interface or the JSON API
 - Contrary to the original version this fork uses multigraphs: this removes the need to query the same API endpoint multiple times, all multigraph plugins have configuration options to switch individual graphs on and off
