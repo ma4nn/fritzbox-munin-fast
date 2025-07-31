@@ -19,7 +19,7 @@
 """
 
 from fritzconnection.lib.fritzstatus import FritzStatus
-from fritzbox_config import FritzboxConfig
+from fritzbox_config import create_fritz_status
 from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler
 
 
@@ -44,7 +44,6 @@ class FritzboxConnectionUptime(MuninPluginInterface):
 
 
 if __name__ == "__main__":
-  config = FritzboxConfig()
-  uptime = FritzboxConnectionUptime(FritzStatus(address=config.server, user=config.user, password=config.password, use_tls=config.use_tls))
+  uptime = FritzboxConnectionUptime(create_fritz_status())
 
   main_handler(uptime)

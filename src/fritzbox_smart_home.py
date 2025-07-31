@@ -6,7 +6,7 @@
 """
 
 from fritzconnection.lib.fritzhomeauto import FritzHomeAutomation
-from fritzbox_config import FritzboxConfig
+from fritzbox_config import create_fritz_homeautomation
 from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler,print_debug
 
 
@@ -95,5 +95,4 @@ class FritzboxSmartHome(MuninPluginInterface):
 
 
 if __name__ == '__main__':
-  config = FritzboxConfig()
-  main_handler(FritzboxSmartHome(FritzHomeAutomation(address=config.server, user=config.user, password=config.password, use_tls=config.use_tls)))
+  main_handler(FritzboxSmartHome(create_fritz_homeautomation()))

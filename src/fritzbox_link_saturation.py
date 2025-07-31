@@ -21,7 +21,7 @@
 
 from statistics import mean
 from fritzconnection.lib.fritzstatus import FritzStatus
-from fritzbox_config import FritzboxConfig
+from fritzbox_config import create_fritz_status
 from fritzbox_munin_plugin_interface import MuninPluginInterface,main_handler,print_debug
 
 
@@ -90,5 +90,4 @@ class FritzboxLinkSaturation(MuninPluginInterface):
 
 
 if __name__ == "__main__":
-  config = FritzboxConfig()
-  main_handler(FritzboxLinkSaturation(FritzStatus(address=config.server, user=config.user, password=config.password, use_tls=config.use_tls)))
+  main_handler(FritzboxLinkSaturation(create_fritz_status()))

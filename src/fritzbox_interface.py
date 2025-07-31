@@ -67,7 +67,7 @@ class FritzboxInterface:
     except JSONDecodeError as json_exception:
       # Perhaps session expired, let's clear the session and try again
       self.__session.clear()
-      sys.exit('ERROR: Did not receive valid JSON data from FritzBox, so automatically cleared the session, please try again: ' + str(json_exception) + ")")
+      sys.exit('ERROR: Did not receive valid JSON data from FritzBox, so automatically cleared the session, please try again: ' + str(json_exception) + ": " + data)
 
     return json_data
 

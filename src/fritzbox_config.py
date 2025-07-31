@@ -1,5 +1,9 @@
 import os
 
+from fritzconnection import FritzConnection
+from fritzconnection.lib.fritzhomeauto import FritzHomeAutomation
+from fritzconnection.lib.fritzstatus import FritzStatus
+
 
 # pylint: disable=too-few-public-methods
 class FritzboxConfig:
@@ -28,3 +32,18 @@ class FritzboxConfig:
       self.certificate_file = str(os.getenv('MUNIN_CONFDIR')) + '/box.cer'
     if os.getenv('fritzbox_use_tls'):
       self.use_tls = str(os.getenv('fritzbox_use_tls')) == 'true'
+
+
+def create_fritz_connection() -> FritzConnection:
+  config = FritzboxConfig()
+  return FritzConnection(address=config.server, user=config.user, password=config.password, use_tls=config.use_tls, timeout=config.timeout)
+
+
+def create_fritz_status() -> FritzStatus:
+  config = FritzboxConfig()
+  return FritzStatus(address=config.server, user=config.user, password=config.password, use_tls=config.use_tls, timeout=config.timeout)
+
+
+def create_fritz_homeautomation() -> FritzHomeAutomation:
+  config = FritzboxConfig()
+  return FritzHomeAutomation(address=config.server, user=config.user, password=config.password, use_tls=config.use_tls)

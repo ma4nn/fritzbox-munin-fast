@@ -13,7 +13,7 @@
   env.fritzbox_ip [ip address of the fritzbox]
   env.fritzbox_password [fritzbox password]
   env.fritzbox_user [fritzbox user, set any value if not required]
-  env.dsl_modes [capacity] [snr] [damping] [errors] [crc]
+  env.dsl_modes [capacity] [snr] [damping] [errors] [crc] [ecc]
 
   This plugin supports the following munin configuration parameters:
   #%# family=auto contrib
@@ -22,7 +22,7 @@
 
 import os
 from fritzconnection import FritzConnection
-from fritzbox_config import FritzboxConfig
+from fritzbox_config import create_fritz_connection
 from fritzbox_interface import FritzboxInterface
 from fritzbox_munin_plugin_interface import MuninPluginInterface, main_handler, print_debug
 
@@ -163,5 +163,4 @@ class FritzboxDsl(MuninPluginInterface):
 
 
 if __name__ == "__main__":
-  config = FritzboxConfig()
-  main_handler(FritzboxDsl(FritzboxInterface(), FritzConnection(address=config.server, user=config.user, password=config.password, use_tls=config.use_tls)))
+  main_handler(FritzboxDsl(FritzboxInterface(), create_fritz_connection()))
